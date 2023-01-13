@@ -1,7 +1,8 @@
 <?php
+// $paginator = new Paginator();
+// $paginator->paginate();
 
-
-$total_images = 50; // total item incoming API, Database, CONST int ...
+    $total_images = 50; // total item incoming API, Database, CONST int ...
 
     $images_per_page = 12; // ?User Input -- our needs for the grid
     // $images_per_row = 4; // ?? CONST for easy and more gridable rows our needs for the grid
@@ -66,7 +67,6 @@ $last_page_class = function () use ($current_page, $total_pages) {
 };
 
 // var_dump($previous_page_class($current_page), $current_page, $total_pages);
-
 // echo $counter_images_current_page;
     echo '<div class="container text-center">';
     
