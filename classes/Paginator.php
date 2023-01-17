@@ -5,6 +5,7 @@
  */
 class Paginator
 {
+    // TODO: update the options for total_images & images_per_page & images_per_row
     public static $total_images = 50; // total item incoming API, Database, CONST int ...
 
     private $images_per_page = 12; // ?User Input -- our needs for the grid
@@ -63,36 +64,52 @@ class Paginator
     /**
      * Get current | min/max page
      * 
+     * @return string|int
      */
     public function getCurrentPage() 
     {
-        // TODO: check for empty ['page'] param
-        // $currentPage = (int) $this->sanitizeGetParams($_GET['page']) ?? 1;
-        // var_dump($this->current_page);
-        if(is_null($this->current_page)){
-            $this->current_page = (int) $this->sanitizeGetParams();
-            var_dump($this->current_page);
-            // die;    
+        // Assign current page value based on GET
+        $this->current_page = isset($this->sanitizeGetParams()['page']) ? $this->sanitizeGetParams()['page'] : null;
+
+        if (is_null($this->current_page)){
+            $this->current_page = 1; // default value if ['page'] param not set up
+        }elseif (!is_numeric($this->current_page)) {
+            header('Location: index.php'); // only numeric params
+        }
+        else{
             if($this->current_page >= $this->getTotalPages()){
-                $this->current_page = (int) $this->getTotalPages();
+                $this->current_page = $this->getTotalPages(); // max page value
             }elseif ($this->current_page <= 0) {
-                $this->current_page =  1;
+                $this->current_page =  1; // min page value
             }
-            // else{
-            //     return $this->current_page;
-            // }
         }
 
         return $this->current_page;
-        // return $currentPage >= $total_pages ? $total_pages : ($_GET['page'] < 0 ? 1 : $_GET['page']); // first|last|$_GET[page] -> page        
     }
 
-    /**
-     * TODO: refactor
+     /**
+     * Sanitize input
+     * 
+     * @return array
      */
-    public function currentPage()
+    public function sanitizeGetParams()
     {
-        return $this->current_page;
+        // Array of parameters to check against     
+        $availableGetParams = array('page');
+        $sanitizedParams = [];
+
+        if(!empty($_GET)){     
+            foreach ($availableGetParams as $parameter) {
+                if(!array_key_exists($parameter, $_GET)){
+                    header('Location: index.php'); // return ('Get param not existing!'); // TODO: header with html-msg ? 
+                    die;
+                }
+                
+                // TODO: pull out in method and update conditions for sanitizing
+                $sanitizedParams[$parameter] = trim(htmlspecialchars($_GET[$parameter], ENT_QUOTES));
+            }
+        }
+        return $sanitizedParams;
     }
 
     /**
@@ -100,11 +117,10 @@ class Paginator
      * @return float|int
      */
     public function getCurrentPageImageOffset() {
-        $offset = (($this->getCurrentPage() * $this->images_per_page) - $this->images_per_page) + 1; // +1 to begin counting from the 1st item       
+        $offset = (($this->getCurrentPage() * $this->images_per_page) - $this->images_per_page) + 1; // +1 -> counting from the 1st item       
 
         if($this->getCurrentPage() <= 0){
-            // $offset = ((1 * $images_per_page) - $images_per_page) + 1; // +1 to begin counting from the 1st item
-            $offset = 1;
+            $offset = 1; // first item to begin
         }
 
         return $offset;
@@ -112,6 +128,7 @@ class Paginator
 
     /**
      * Get previous page
+     * @return string
      */
     public function getPreviousPage()
     {
@@ -125,6 +142,7 @@ class Paginator
 
     /**
      * Get next page
+     * @return string
      */
     public function getNextPage($last_page = false)
     {
@@ -137,33 +155,7 @@ class Paginator
         else {
             $next_page = $this->getCurrentPage() + 1;
             return "{$uri}{$next_page}";
-        }
-        // return $next_page = $this->getCurrentPage() <= 0 ? 2 : $this->getCurrentPage() + 1;        
-    }
-
-    /**
-     * Sanitize input
-     * @param mixed $input
-     * @return mixed
-     */
-    public function sanitizeGetParams()
-    {
-        // var_dump($input);        
-        $availableGetOptions = array('page');
-        $sanitizedParams = [];
-
-        if(!empty($_GET)){            
-            // var_dump($_GET);
-            foreach ($availableGetOptions as $option) {
-                if(!array_key_exists($option, $_GET)){
-                    header('Location: index.php'); // return ('Get param not existing!'); // TODO: header with html-msg ? 
-                    die;
-                }
-                $sanitizedParams[$option] = htmlspecialchars($_GET[$option], ENT_QUOTES);
-            }
-        }
-        // sanitize
-        return $sanitizedParams;
+        }  
     }
 
     /////////////////////////////
