@@ -5,8 +5,7 @@
  */
 class Paginator
 {
-    // TODO: update the options for total_images & images_per_page & images_per_row
-    public static $total_images = 50; // total item incoming API, Database, CONST int ...
+    private $total_images = 50; // total item incoming API, Database, CONST int ...
 
     private $images_per_page = 12; // ?User Input -- our needs for the grid
 
@@ -49,7 +48,16 @@ class Paginator
      */
     public function getTotalPages()
     {
-        return $total_pages = ceil(self::$total_images / $this->images_per_page);
+        return $total_pages = ceil($this->getTotalImages() / $this->images_per_page);
+    }
+
+    /**
+     * Get total images count
+     * 
+     */
+    public function getTotalImages()
+    {
+        return $this->total_images;
     }
 
     /**
@@ -88,32 +96,67 @@ class Paginator
     }
 
      /**
-     * Sanitize input
-     * 
+     * Sanitize GET input
+     * TODO: accept [] of parameters to sanitize
      * @return array
      */
     public function sanitizeGetParams()
     {
-        // Array of parameters to check against     
+        // List of allowed GET parameters to check against     
         $availableGetParams = array('page');
-        $sanitizedParams = [];
+        $parameterSecured = [];
 
         if(!empty($_GET)){     
             foreach ($availableGetParams as $parameter) {
                 if(!array_key_exists($parameter, $_GET)){
-                    header('Location: index.php'); // return ('Get param not existing!'); // TODO: header with html-msg ? 
+                    header('Location: index.php'); 
                     die;
                 }
                 
-                // TODO: pull out in method and update conditions for sanitizing
-                $sanitizedParams[$parameter] = trim(htmlspecialchars($_GET[$parameter], ENT_QUOTES));
+                # TODO: create Validation class to handle the process, with error msg to display ...
+                // Sanitize            
+                $parameterSanitized[$parameter] = trim(htmlspecialchars($_GET[$parameter]));
+                
+                // Validate
+                $parameterValidated[$parameter] = $this->validateGetParams($parameterSanitized);
+
+                if($parameterValidated[$parameter] === FALSE){
+                    header('Location: index.php');
+                    die;
+                }
+                
+                $parameterSecured[$parameter] = $parameterValidated[$parameter];
             }
         }
-        return $sanitizedParams;
+        
+        return $parameterSecured;
+    }
+
+    /**
+     * Validate GET input
+     * 
+     * @param array $parameter
+     * 
+     * @return string
+     */
+    public function validateGetParams($parameter)
+    {
+        $validatedParameters = [];
+
+        // Validate GET params 
+        foreach ($parameter as $key => $value) {
+            if($key == 'page'){
+                $validatedParameters = filter_var($value, FILTER_VALIDATE_FLOAT);
+            }
+            # TODO: add updated list of GET param checks
+        }        
+
+        return $validatedParameters;
     }
 
     /**
      * Get current images offset, based on the get page parameter
+     * 
      * @return float|int
      */
     public function getCurrentPageImageOffset() {
@@ -128,6 +171,7 @@ class Paginator
 
     /**
      * Get previous page
+     * 
      * @return string
      */
     public function getPreviousPage()
@@ -158,9 +202,4 @@ class Paginator
         }  
     }
 
-    /////////////////////////////
-    public function paginate()
-    {
-        echo 'test paginate';
-    }
 }

@@ -1,3 +1,7 @@
-/* div{
-    background-color: green;
-} */
+body {
+    background-image: radial-gradient(farthest-side at 50% 50%, red, yellow, black);
+}
+
+.card-body{
+    background-color: wheat;
+}

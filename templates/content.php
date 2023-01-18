@@ -2,22 +2,23 @@
     // Paginator instance for the content
     $paginator = new Paginator();
 
-    echo '<div class="container text-center">';    
+    echo '<div class="container text-center">';
+    $itemCounter = $paginator->getCurrentPageImageOffset();
     for ($i = 0; $i < $paginator->getTotalRows(); $i++) {                
         echo '<div class="row">'; // start row                
         for($k = 0; $k < 4; $k++){ // items 
-            if ($paginator->getCurrentPageImageOffset() <= $paginator::$total_images) {
+            if ($paginator->getCurrentPageImageOffset() <= $paginator->getTotalImages()) {
                 echo '<div class="col">
                     <div class="card">
-                        <img src="'.$base->getAssetsPath().'/bottle.jpg" class="card-img-top" alt="...">
+                        <img src="'.$base->getAssetsPath().'/pesto.jpg" class="card-img-top" alt="...">
                         <div class="card-body">
-                            <h5 class="card-title">Card title -- '.$paginator->getCurrentPageImageOffset().'</h5>
-                            <p class="card-text">Card content.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                            <h5 class="card-title">Title: <strong>'.$itemCounter.'</strong></h5>
+                            <p class="card-text">Content ...</p>
+                            <a href="#" class="btn btn-primary">Read more</a>
                         </div>
                     </div>
                 </div>';
-                $paginator->getCurrentPageImageOffset() + 1;
+                $itemCounter ++;
             }else{
                 echo '<div class="col"></div>'; // empty img col
             }
