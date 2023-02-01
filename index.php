@@ -2,6 +2,11 @@
 require_once('classes/Base.php');
 // Base::autoload();
 $base = new Base();
+
+ // Paginator instance for the content
+ $paginator = new Paginator();    
+
+ 
 // include_once('classes/Paginator.php');
 // $base = new Base();
 // $paginator = new Paginator();
