@@ -7,7 +7,7 @@
     echo '
             <form action="index.php" method="GET">
                 <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg" name="dataSource" id="dataSource">
-                    <option selected>Choose Data Source</option>
+                    <option value="0" selected>Choose Data Source</option>
                     <option value="api">API</option>
                     <option value="database">Database</option>
                     <option value="50items">50 Items</option>
@@ -21,27 +21,28 @@
             var data = {};
             // console.log(apiData);
             $("#dataSource").on('change', function () {
-                //TODO: Window location to index with GET param from the select?
-
-                // var urlParams = new URLSearchParams(window.location.search);
+                // get/set/redirect to index based on the dataSource params from the <select>
                 var currentUrl = new URL(window.location.href);
                 var params = new URLSearchParams(currentUrl.search);
-                params.set('dataSource', 'api');
+                var selectedDatasource = $('#dataSource').find(":selected").val();
+
+                params.set('dataSource', selectedDatasource);
                 currentUrl.search = params;
                 window.location.href = currentUrl;
-                console.log(currentUrl, params);
+                                
+                // Make a proper data loading based on the GET param api/database/default50items
+                // console.log(apiData);
+                // apiCall();
                 // return;
-
-
-                // window.location.href = 'index.php?dataSource=api';
-                // Set data into session?
-                apiCall();
-
-                document.cookie = 'items='+JSON.stringify(apiData);
+                
+                // $('.row .col .card-body .card-text').each(function(index){
+                //     console.log($(this).text());
+                // });
+                
+                // Set data into session? cookie ?
+                // document.cookie = 'items='+JSON.stringify(apiData);
                 <?php // $_SESSION['items'] = '';?>
-                console.log(apiData);
-
-                // Create and set the data, based on condition of the select-value ... db, API etc
+                // console.log(apiData);
             });
         </script>
         <?php

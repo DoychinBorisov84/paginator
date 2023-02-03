@@ -105,14 +105,16 @@ class Paginator
     public function getPageURL($page = FALSE)
     {
         $query = $_GET; //http-query
-        $current_page = $query['page'];
+        // $current_page = $query['page'];
+        $current_page = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
 
         if($page){
             $query['page'] = $page;
         }
 
         $url = http_build_query($query);
-
+        // var_dump($url);
+        // die;
         return $_SERVER['PHP_SELF'].'?'.$url;
     }
 
@@ -147,8 +149,9 @@ class Paginator
                     header('Location: index.php');
                     die;
                 }
-                
                 $parameterSecured[$parameter] = $parameterValidated[$parameter];
+                // var_dump($parameterSecured);
+                // die;
             }
         }
         
@@ -168,13 +171,13 @@ class Paginator
 
         // Validate GET params 
         foreach ($parameter as $key => $value) {
-            if($key == 'page'){
+            if ($key == 'page'){
                 $validatedParameters = filter_var($value, FILTER_VALIDATE_FLOAT);
             }elseif ($key == 'dataSource'){
                 // var_dump($key, $value); die;
-                $options = ['api', 'database', '50items'];
+                $options = ['api', 'database', '50items', 0];
 
-                $validatedParameters = $value;
+                $validatedParameters = $value; // == 0 ? '50items' : $value;
                 if(!in_array($value, $options)){
                     $validatedParameters = FALSE;
                 }
@@ -208,12 +211,13 @@ class Paginator
     public function getPreviousPage()
     {
         $query = $_GET; // current http-query
-        $query['page'] = $_GET['page']; // current http-query {page} param
+        $query['page'] = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
 
 
         if($this->getCurrentPage() == 1){
             return '#';
-        }else if($this->getCurrentPage() >= $this->getTotalPages()){
+        }elseif($this->getCurrentPage() >= $this->getTotalPages()){
+            // die('sa');
             $query['page'] =  $this->getTotalPages() - 1 ;
             $newQuery = http_build_query($query);
             $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
@@ -232,11 +236,13 @@ class Paginator
      * Get next page
      * @return string
      */
-    public function getNextPage($last_page = false)
+    public function getNextPage($last_page = FALSE)
     {        
         // $uri = "index.php?page=";
         $query = $_GET; // current http-query
         // $query['page'] = $_GET['page']; // current http-query {page} param
+        $current_page = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
+
 
         if($this->getCurrentPage() == $this->getTotalPages()){
             return '#';        
@@ -249,7 +255,8 @@ class Paginator
         else {
                 // var_dump ($_SERVER['REQUEST_URI'], $_GET, $_SERVER['PHP_SELF']);
             // $query = $_GET;
-            $query['page'] = $_GET['page'] + 1;
+            // $query['page'] = $_GET['page'] + 1;
+            $query['page'] = $current_page + 1;
             $newQuery = http_build_query($query);
             $next_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
             return $next_page;
