@@ -1,11 +1,12 @@
 <?php
-
-// echo (json_encode($_GET)); 
+include('../classes/Paginator.php');
+// echo (json_encode($_GET));
+// die;
 // die();
 // echo json_encode(array('cat' => 'Meaw', 'dog' => 'Bobo')); 
 
+// Database Source
 // Make DB request and prepare data, check params for &page&dataSource; 
-
 $db = 'mysql';
 $host = 'localhost';
 $db_name = 'test_users';
@@ -25,12 +26,15 @@ try {
         // print_r($row);
     }
     $dsn = null;
+    $data['count'] = sizeof($data); // pass the data
 } catch (PDOException $e) {
     print "Error!: " . $e->getMessage() . "<br/>";
     die();
 }
 
- echo json_encode($data);
+// var_dump($paginator);
+// die;
+echo json_encode($data);
 
 
 

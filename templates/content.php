@@ -18,7 +18,7 @@
 
         ?>
         <script>
-            var data = {};
+            // var data = {};
             // console.log(apiData);
             $("#dataSource").on('change', function () {
                 // get/set/redirect to index based on the dataSource params from the <select>
@@ -46,6 +46,12 @@
             });
         </script>
         <?php
+
+        
+       // echo '<script type="text/javascript">test(); </script>';
+
+
+
         // If cases for checking the post param
         // if($_SERVER['REQUEST_METHOD'] === "GET" && isset($_GET['dataSource'])){
         //     echo '<script type="text/javascript"> apiCall() </script>';

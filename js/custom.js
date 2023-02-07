@@ -1,5 +1,5 @@
-var test = 'daaaaaaaaaaaaaaaa';
-var apiData = {};
+// var test = 'daaaaaaaaaaaaaaaa';
+var dataSource;
 
 // Load DOM 
 $(document).ready(function(){
@@ -12,36 +12,16 @@ $(document).ready(function(){
     // Initial loading the data from the api
     // apiCall();
     
-    // apiData = apiCall() === undefined ? 'dummyData' : apiCall();
 
     // Set the selectselected based on http-query param
     var urlParams = (new URL(document.location)).searchParams;
     var urlDatasource = urlParams.get('dataSource');
     $('#dataSource').val(urlDatasource);
 
+    // Init data loaded, to use size, etc ... on page load ??? 
+    initDataCall();
+    // console.log(dataSource, current_page);
 
-    // Load the data based on select
-    var selectedDatasource = $('#dataSource').find(":selected").val();    
-    if(selectedDatasource == 'api'){
-        apiData = apiCall();
-        // console.log(apiData);
-    }else if(selectedDatasource == 'database'){
-        apiData = databaseCall();
-    }else{
-        // default 50 items load
-    }
-    // console.log(apiData);
-
-    // Keep the text inside the card at minimum width
-    // $('.row .col .card-body .card-text').each(function(index){
-    //     console.log($(this).text());
-    // });
-
-    
-    // return;
-    // $('#dataSource').val('api');
-
-    // console.log(apiData);
 });
 
 // Make the API ajax call
@@ -60,7 +40,7 @@ function apiCall(){
                 // console.log(status);
             },
             success: function (response) {  
-                apiData = JSON.stringify(response);
+                dataSource = JSON.stringify(response);
                 // console.log(response);
                 // Work with the data due to async call, so n/a data into the document.ready()
                 // each ... set
@@ -83,9 +63,35 @@ function apiCall(){
 
                     // console.log($(this), index);
                     // console.log(element, response);
+                    $(element).find('.card img').attr('src', response[index+offset+1].avatar);
                     $(element).find('.card-body .card-title').text(response[index+offset+1].first_name);
                     $(element).find('.card-body .card-text').text(response[index+offset+1].address.city + ', ' + response[index+offset+1].email);
-                    $(element).find('.card img').attr('src', response[index+offset+1].avatar);
+
+                    if( $(element).find('.card-body .card-text').text().length > 25 ) {
+                        var originText = $(element).find('.card-body .card-text').text();
+                        var slicedText = $(element).find('.card-body .card-text').text().slice(0, 22)+'...';
+                        $(element).find('.card-body .card-text').text($(element).find('.card-body .card-text').text().slice(0, 22)+'...');
+                        console.log($(element).find('.card-body .card-text').text().slice(0, 25));
+                        // TODO.... continue here Click to expand the sliced text.
+                        console.log($(this));
+                        $(this).hover(
+                            function(){
+                                // console.log('entered');
+                                // console.log($(this), originText, $(element).find('.card-body .card-text').text());
+                                $(element).find('.card-body .card-text').addClass('onFocus');
+                                $(element).find('.card-body .card-text').text(originText);
+                                // $(this).append($("<span>***</span>"));
+                            },
+                            function(){
+                                // console.log('left');
+                                $(element).find('.card-body .card-text').removeClass('onFocus');
+                                $(element).find('.card-body .card-text').text(slicedText);
+                                // $(this).find("span").last().remove();
+                            }
+                        );
+                    }
+
+                    
                     // $('.card-body .card-title').text(response[index].first_name);
                     // $('.card-text').text(response[0].address.city + ', ' + response[0].address);
 
@@ -125,6 +131,8 @@ function apiCall(){
 function databaseCall(){
     // var data = (new URL(document.location)).search;
     // console.log(data);
+    test();
+
     $.ajax({
         type: "GET",
         url : "/paginator/api/data_sources.php",
@@ -137,7 +145,9 @@ function databaseCall(){
             // console.log(status);
         },
         success: function (response) {  
-            // console.log(response);
+            console.log(response); //, response.length
+            test();
+            // dataSource = response;
             // return;
             var urlParams = (new URL(document.location)).searchParams;
             var urlPage = urlParams.get('page');
@@ -162,13 +172,30 @@ function databaseCall(){
 
                 // TODO: keep the text size in limit to prevent overlapping divs
                 // $('.row .col .card-body .card-text').each(function(index){
-                console.log( $(element).find('.card-body .card-text').text(), $(element).find('.card-body .card-text').text().length );
+                // console.log( $(element).find('.card-body .card-text').text(), $(element).find('.card-body .card-text').text().length );
                 
                 if( $(element).find('.card-body .card-text').text().length > 25 ) {
-                    $(element).find('.card-body .card-text').text($(element).find('.card-body .card-text').text().slice(0, 25));
-                    console.log($(element).find('.card-body .card-text').text().slice(0, 25));
+                    var originText = $(element).find('.card-body .card-text').text();
+                    var slicedText = $(element).find('.card-body .card-text').text().slice(0, 22)+'...';
+                    $(element).find('.card-body .card-text').text($(element).find('.card-body .card-text').text().slice(0, 22)+'...');
+                    // console.log($(element).find('.card-body .card-text').text().slice(0, 25));
                     // TODO.... continue here Click to expand the sliced text.
-                    $(element).find('.card-body .card-text').text();
+                    // console.log($(this));
+                    $(this).hover(
+                        function(){
+                            // console.log('entered');
+                            // console.log($(this), originText, $(element).find('.card-body .card-text').text());
+                            $(element).find('.card-body .card-text').addClass('onFocus');
+                            $(element).find('.card-body .card-text').text(originText);
+                            // $(this).append($("<span>***</span>"));
+                        },
+                        function(){
+                            // console.log('left');
+                            $(element).find('.card-body .card-text').removeClass('onFocus');
+                            $(element).find('.card-body .card-text').text(slicedText);
+                            // $(this).find("span").last().remove();
+                        }
+                    );
                 }
                 // });
 
@@ -183,6 +210,28 @@ function databaseCall(){
             // console.log(error);
         }       
     });
+}
+
+// Init the call, so we can have base dataSource
+function initDataCall(){
+    var selectedDatasource = $('#dataSource').find(":selected").val();    
+    // console.log(selectedDatasource);
+    if(selectedDatasource == 'api'){
+        dataSource = apiCall(); //'api'; 
+        // console.log(dataSource);
+    }else if(selectedDatasource == 'database'){
+        // dataSource = databaseCall(); // 'database';
+        databaseCall();
+        // console.log(dataSource);
+    }else{
+        dataSource = 'dummy';
+        // default 50 items load
+    }
+}
+
+function test(){
+    // return 'aa';
+    console.log('testoooo');
 }
 
 // Add the active page class

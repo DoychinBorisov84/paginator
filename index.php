@@ -4,7 +4,9 @@ require_once('classes/Base.php');
 $base = new Base();
 
  // Paginator instance for the content
- $paginator = new Paginator();    
+$dataSource = $_GET['dataSource'];
+$paginator = new Paginator($dataSource);
+var_dump($paginator->getDataSource());
 
  
 // include_once('classes/Paginator.php');

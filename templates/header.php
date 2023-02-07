@@ -11,6 +11,9 @@
 
         <script type="text/javascript">
             var current_page = '. ($paginator->getCurrentPage()) .';
+
+            //var dataSource = {};
+
         </script>
 
         <script type="text/javascript" src="js/custom.js"></script>

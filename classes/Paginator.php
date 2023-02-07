@@ -13,10 +13,35 @@ class Paginator
 
     private $current_page;
 
-    public function __construct()
+    private $dataSource;
+
+    public function __construct($dataSource)
     {
+        // Todo method for sanitizing the class ...
+        $this->dataSource = $this->sanitizeGetParams(); 
+        echo $this->setDataSource($dataSource);
+
         $this->current_page = $this->getCurrentPage();
     }
+
+    /**
+     * Set dataSource
+     */
+    public function setDataSource($dataSource)
+    {
+        // Sanitize...
+        $this->dataSource = $dataSource;
+    }
+
+    /**
+     * Get dataSource
+     */
+    public function getDataSource()
+    {
+        return $this->dataSource;
+    }
+
+
 
     /**
      * Get previous page class
@@ -52,8 +77,18 @@ class Paginator
     }
 
     /**
+     * Set total images count, based on data-source
+     * 
+     */
+    public function setTotalImages()
+    {
+
+    }
+
+    /**
      * Get total images count
      * 
+     * @return int
      */
     public function getTotalImages()
     {
