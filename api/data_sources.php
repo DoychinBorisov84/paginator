@@ -1,5 +1,6 @@
 <?php
-include('../classes/Paginator.php');
+// TODO: create new Paginator($source) .... and return to custom.js with all the props setted up for use
+// include('../classes/Paginator.php');
 // echo (json_encode($_GET));
 // die;
 // die();
@@ -34,6 +35,7 @@ try {
 
 // var_dump($paginator);
 // die;
+// echo json_encode($data);
 echo json_encode($data);
 
 

@@ -40,13 +40,30 @@ class Base
     }
     
 
+    // TODO: register the api/ folder
     /**
      * Autoload app classes
      */
     static protected function autoloadClasses()
     {
+        // echo $root = $_SERVER['DOCUMENT_ROOT'].'paginator/';
         spl_autoload_register(function ($class) {
-            include($class . '.php');
+            $root = $_SERVER['DOCUMENT_ROOT'] . 'paginator/';
+            $dirs = array(
+                $root.'classes/',
+                $root.'api/',
+                $root.'interface/'
+            );
+
+            foreach ($dirs as $dir) {
+                // echo $dir.'----';
+                // echo $dir. ' -- '. $class;
+                if (file_exists($dir.$class.'.php')){
+                    require_once($dir.$class . '.php');
+                    // return;
+                    // echo $dir . $class . '.php';
+                }
+            }
         });
         // echo 'triggererd';
     }

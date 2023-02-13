@@ -1,25 +1,29 @@
 <?php
 require_once('classes/Base.php');
-// Base::autoload();
+
 $base = new Base();
 
  // Paginator instance for the content
 $dataSource = $_GET['dataSource'];
-$paginator = new Paginator($dataSource);
-var_dump($paginator->getDataSource());
-
- 
-// include_once('classes/Paginator.php');
-// $base = new Base();
 // $paginator = new Paginator();
-// var_dump(get_included_files());
-// echo $paginator->paginate();
-// echo $base->getTemplatesPath('content');
 
-    
+// Integrate via DI into Paginator ?
+// Can we achieve ajax returned Obj generated on <select> change to be available initially, so we can instantiate here?
+$paginator = $dataSource != 'defaultData' ? new Paginator(new DataSource($dataSource), 33) : new Paginator(new DataSource('defaultData'), 33);
+// var_dump(get_declared_classes());
 
-    // var_dump(nextPage($current_page, $total_pages), $current_page, $total_pages);
-    // var_dump($total_pages, $total_rows, $current_page, $counter_images_current_page);
+// $initiator = new Initiator();
+// var_dump($initiator);
+
+// $x = '<script type="text/javascript" src="js/custom.js"> test(); </script>';
+// echo $x;
+// var_dump($_COOKIE['response_size'] );    // $paginator->getDataSource()->getSource()
+// var_dump($paginator, json_decode($_COOKIE['items'], true), $_COOKIE['response_size'] );    // $paginator->getDataSource()->getSource()
+// var_dump($_COOKIE);    // $paginator->getDataSource()->getSource()
+
+
+// $x = new DataSource(ucfirst($dataSource));
+// echo $x->getSource()->getData();
 
  ?> 
     <!-- Header -->
