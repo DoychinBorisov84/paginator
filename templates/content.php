@@ -20,10 +20,11 @@
             </form>
         ';
 
+        // HERE: clean for empty DOM and set in custom.js loading...
     $itemCounter = $paginator->getCurrentPageImageOffset();
-    for ($i = 0; $i < $paginator->getTotalRows(); $i++) {                
+    // for ($i = 0; $i < $paginator->getTotalRows(); $i++) {                
         echo '<div class="row">'; // start row                
-        for($k = 0; $k < 4; $k++){ // items per row
+        for($k = 0; $k < 4; $k++){ // items/columns per row
             if ($paginator->getCurrentPageImageOffset() <= $paginator->getTotalImages()) {
                 echo '<div class="col">
                     <div class="card">
@@ -41,35 +42,34 @@
             }
         }
         echo '</div>'; // end row
-    }
+    // }
     echo '</div>';
 
     //<!-- Pagination -->
     echo '<div class="container-lg p-4">';
     echo '<nav aria-label="Page navigation">
          <ul class="pagination pagination-lg justify-content-center">';
+         
     // <!-- Previous Page -->
         echo'<li class="page-item">
-            <a class="page-link '.$paginator->getPreviousPageClass() .'" href="'. $paginator->getPreviousPage().'">Previous</a>
+            <a class="page-link " href="" id="previous-page">Previous</a>
         </li>';
+
     // <!-- Iterrator pages -->
-        echo'<li class="page-item" data-activepage="1"><a class="page-link" href="'.$paginator->getPageURL(1).'">1</a></li>
-            <li class="page-item" data-activepage="2"><a class="page-link" href="'.$paginator->getPageURL(2).'">2</a></li>';
-        
-        if($paginator->getCurrentPage() >= 3){
-            echo'<li class="page-item"><a class="page-link" href="#">...</a></li>
-            <li class="page-item" data-activepage="'. $paginator->getCurrentPage() .'"><a class="page-link" href="'.$paginator->getPageURL($paginator->getCurrentPage()) .'">'.$paginator->getCurrentPage().'</a></li>';
-        }
+        echo'<li class="page-item" data-activepage="1"><a class="page-link" href="">1</a></li>
+            <li class="page-item" data-activepage="2"><a class="page-link" href="">2</a></li>';
+    
+        echo'<li class="page-item iterator-block"><a class="page-link" href="#">...</a></li>
+                <li class="page-item iterator-block" data-activepage=""><a class="page-link" href="" id="current-page"></a></li>';
         
     // <!-- Next Page -->
         echo '<li class="page-item">                    
-            <a class="page-link '. $paginator->getNextPageClass() .'"  
-            href="'. $paginator->getNextPage() .'">Next</a>
+            <a class="page-link " href="" id="next-page">Next</a>
         </li>';
 
     // <!-- Last Page -->
         echo '<li class="page-item">
-            <a class="page-link '. $paginator->getLastPageClass() .'" href="'. $paginator->getNextPage(true) .'" id="last-page">Last Page</a>
+            <a class="page-link " href="" id="last-page">Last Page</a>
         </li>';
 
         echo'</ul>

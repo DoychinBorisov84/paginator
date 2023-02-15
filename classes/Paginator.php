@@ -202,20 +202,40 @@ class Paginator
      * 
      * @return mixed
      */
-    public function getPageURL($page = FALSE)
+    public function getPageURL($page = FALSE, $ajax_call = NULL)
     {
-        $query = $_GET; //http-query
-        // $current_page = $query['page'];
-        $current_page = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
+        if(!$ajax_call){
+            $query = $_GET; //http-query
+            // $current_page = $query['page'];
+            $current_page = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
+    
+            if($page){
+                $query['page'] = $page;
+            }
+    
+            $url = http_build_query($query);
+            // var_dump($url);
+            // die;
+            return $_SERVER['PHP_SELF'].'?'.$url;
+        }else{
+            $href = parse_url($ajax_call);
+            $ajax_query = $href['query'];
+            $ajax_path = $href['path'];
+            
+            parse_str($ajax_query, $newQuery);
+            if($page){
+                $newQuery['page'] = $page;
+            }
 
-        if($page){
-            $query['page'] = $page;
+            $newPageQuery = http_build_query($newQuery);
+
+            return $url = $ajax_path . '?' . $newPageQuery;
+            // var_dump($newQuery);
+            
+            // if($page){
+
+            // }
         }
-
-        $url = http_build_query($query);
-        // var_dump($url);
-        // die;
-        return $_SERVER['PHP_SELF'].'?'.$url;
     }
 
      /**
@@ -315,28 +335,42 @@ class Paginator
      * 
      * @return string
      */
-    public function getPreviousPage()
+    public function getPreviousPage($current_page_ajax = NULL, $total_page_ajax = NULL)
     {
-        $query = $_GET; // current http-query
-        $query['page'] = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
-
-
-        if($this->getCurrentPage() == 1){
-            return '#';
-        }elseif($this->getCurrentPage() >= $this->getTotalPages()){
-            // die('sa');
-            $query['page'] =  $this->getTotalPages() - 1 ;
+        if(!$current_page_ajax && !$total_page_ajax){
+            $query = $_GET; // current http-query
+            $query['page'] = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
+    
+    
+            if($this->getCurrentPage() == 1){
+                return '#';
+            }elseif($this->getCurrentPage() >= $this->getTotalPages()){
+                // die('sa');
+                $query['page'] =  $this->getTotalPages() - 1 ;
+                $newQuery = http_build_query($query);
+                $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
+                return $previous_page;
+    
+                // return $this->getTotalPages() - 1;
+            }
+            $query['page'] =  $this->getCurrentPage() - 1 ;
             $newQuery = http_build_query($query);
-            $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
-            return $previous_page;
-
-            // return $this->getTotalPages() - 1;
+            return $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
+    
+            // return $previous_page = $this->getCurrentPage() - 1;
+        }else{
+            if($current_page_ajax == 1){
+                return '#';
+            }elseif($current_page_ajax >= $total_page_ajax){
+                $previous_page = $current_page_ajax - 1;
+                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource=restapi&page=' . $previous_page;
+                return $implement_uri_not_relying_which_script_is_calling_it;
+            }else{
+                $previous_page = $current_page_ajax - 1;
+                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource=restapi&page=' . $previous_page;
+                return $implement_uri_not_relying_which_script_is_calling_it;
+            }
         }
-        $query['page'] =  $this->getCurrentPage() - 1 ;
-        $newQuery = http_build_query($query);
-        return $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
-
-        // return $previous_page = $this->getCurrentPage() - 1;
     }
 
     /**
@@ -388,9 +422,6 @@ class Paginator
                 return $implement_uri_not_relying_which_script_is_calling_it;
             }
         }
-
-        
-
 
     }
 
