@@ -15,10 +15,8 @@ class DataSource
     public function __construct($source)
     {
         // Create, sanitize from source class and return ... only if class/dir/available ???
-        $this->source = new $source();
-        
         // echo "Datasource of type $this->source constucted";
-        // return $this->source;
+        $this->source = new $source();
     }
 
     public function getSource()

@@ -12,23 +12,24 @@ if(isset($_POST)){
     $dataSize = $_POST['ajaxDataSize'];
     $currentPage = $_POST['page'];
     $current_page_url = $_POST['current_url'];
+    $dataSourceType = $_POST['dataSourceType'];
     // $urlParams = $_POST['dummy'];
 }
 
-// var_dump($current_page_url);
+// var_dump($dataSourceType);
 // die;
 class Initiator
 {
-    public function initiatePaginator()
-    {
-        //Data preparing
-        return json_encode(array('data' => 1, 'bata' => 2));
-    }
+    // public function initiatePaginator()
+    // {
+    //     //Data preparing
+    //     return json_encode(array('data' => 1, 'bata' => 2));
+    // }
 
 }
 
-$dataSource = new DataSource('Restapi');
-$paginator = new Paginator($dataSource, $data);
+$dataSource = new DataSource($dataSourceType);
+$paginator = new Paginator($dataSource);
 $paginator->setTotalImages($dataSize);
 $paginator->setDataSourceData($data);
 $paginator->setDataSourceDataSize($dataSize);
@@ -43,13 +44,14 @@ $response = [
     'get_page_current_page' => $paginator->getPageURL($currentPage, $current_page_url),
     'current_page' => $paginator->getCurrentPage($currentPage),
     'previous_page' => $paginator->getPreviousPage($currentPage, $paginator->getTotalPages()),
-    'last_page' => $paginator->getNextPage(TRUE, $currentPage, $paginator->getTotalPages()),
     'next_page' => $paginator->getNextPage(FALSE, $currentPage, $paginator->getTotalPages()),
+    'last_page' => $paginator->getNextPage(TRUE, $currentPage, $paginator->getTotalPages()),
     'total_pages' => $paginator->getTotalPages(),
     'total_images' => $paginator->getTotalImages(),
     'total_rows' => $paginator->getTotalRows(),
     'current_page_images_offset' => $paginator->getCurrentPageImageOffset($currentPage),
-    'paginator_get_data_source_data_size' => $paginator->getDataSourceDataSize()
+    'paginator_get_data_source_data_size' => $paginator->getDataSourceDataSize(),
+    'paginator_dataSource_type' => $paginator->getDataSourceType()
     // 'last_page' => $paginator->getNextPage($last)
 ];
 echo json_encode($response);

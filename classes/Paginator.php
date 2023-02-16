@@ -18,58 +18,36 @@ class Paginator
 
     private $dataSourceData;
 
-    public function __construct(DataSource $dataSource, $data)
-    {
-        // Todo method for sanitizing(pass only predefined from sanitizeGetParams()) the class ...
-        // $this->dataSource = $this->sanitizeGetParams(); 
-
-        $this->dataSource = $dataSource;        
+    public function __construct(DataSource $dataSource)
+    {        
         $this->setDataSource($dataSource);
-        // var_dump($this->dataSource, $data);
-        $this->setDataSourceData($data);
+        
+        // $this->setDataSourceData($data); // ?
 
-        // $this->current_page = $this->getCurrentPage();
+        // Set the page based on http GET param
         $this->getCurrentPage();
     }
 
     /**
-     * Set dataSource
+     * Set Datasource $dataSource
+     * 
+     * @return void
      */
-    public function setDataSource($dataSource, $data = NULL)
+    public function setDataSource($dataSource)
     {
         // TODO: Sanitize...
-        $this->dataSource = $dataSource;
-
         //TODO:  refactor If we got Database, REST Api or Default ... set the Paginator props below; bring out into method
-        // var_dump(sizeof($this->dataSource->getSource()->getAllData()));
-        // var_dump($this->dataSource);
-        // var_dump($this->$dataSource->getDataSource()); die;
-        // if($data){
-        //     $this->$dataSource->getDataSource()->setData($data);
-        // }
-
         // // Works for DB! How to impelement properly for many sources? The restapi is not being setted up to that point
         // if( get_class($this->dataSource) == "Database"){
         //     $this->setTotalImages(sizeof($this->dataSource->getSource()->getAllData()));
         // }
-        // else{
-        //     $this->
-        // }
-        return $this->dataSource;
+        $this->dataSource = $dataSource;
     }
 
     public function setDataSourceData($data)
     {
         $this->dataSource->getSource()->setData($data);
         $this->dataSourceData = $data;
-
-        // Set Paginator(DataSource $dataSource) props
-            // var_dump($this->dataSourceData);
-            // $this->setTotalImages(sizeof($data));
-            // $this->setDataSourceDataSize(sizeof($data));
-            // $this->current_page = $this->getCurrentPage();
-
-        //
         
         return $this->dataSourceData;
     }
@@ -78,6 +56,7 @@ class Paginator
     {
         return $this->dataSource->getSource()->getData();
     }
+
     public function setDataSourceDataSize($dataSize)
     {
         $this->setTotalImages($dataSize);
@@ -97,6 +76,12 @@ class Paginator
         // return $this->dataSource;
         return $this->dataSource->getSource()->getData();
 
+    }
+
+    public function getDataSourceType()
+    {
+        // var_dump( get_class($this->dataSource->getSource()));
+        return get_class($this->dataSource->getSource());
     }
 
 
@@ -413,12 +398,13 @@ class Paginator
             if($current_page_ajax == $total_pages_ajax){
                 return '#';  
             }elseif($last_page == TRUE){
-                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource=restapi&page=' . $total_pages_ajax;
+                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $total_pages_ajax;
                 return $implement_uri_not_relying_which_script_is_calling_it;
             }
             else{
                 $next_page = $current_page_ajax + 1;
-                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource=restapi&page=' . $next_page;
+                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $next_page;
+                // strtolower($this->getDataSourceType());
                 return $implement_uri_not_relying_which_script_is_calling_it;
             }
         }

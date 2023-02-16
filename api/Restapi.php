@@ -7,19 +7,7 @@ class Restapi implements DataInterface
 {
     private $data;
 
-    private $dataSize;
-
-    public function getAllData()
-    {
-        return ['dummy' => 222, 'gummy' => 333];
-        
-        // // TODO: make polymorphic with naming etc...
-        // $query_string = "SELECT * FROM users";
-
-        // $this->data = $this->dbQuery($query_string)->fetchAll();
-
-        // return $this->data;
-    }
+    private $dataSize;    
 
     public function setData($data)
     {

@@ -22,16 +22,18 @@ $pdo_options = [];
 $data = [];
 try {
     $dsn = new PDO($dsn, $db_user, $db_password, $pdo_options);
+    // Prepare the JSON data for the custom.js
     foreach($dsn->query('SELECT * from users', PDO::FETCH_ASSOC) as $row) {
+        // var_dump($row);
         $data[] = $row;
         // print_r($row);
     }
-    $dsn = null;
-    $data['count'] = sizeof($data); // pass the data
+    // $data['count'] = sizeof($data); // pass the data
 } catch (PDOException $e) {
     print "Error!: " . $e->getMessage() . "<br/>";
     die();
 }
+$dsn = null;
 
 // var_dump($paginator);
 // die;

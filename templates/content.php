@@ -1,26 +1,17 @@
-<?php 
-// session_start();
-// $pahgoooo = '<script> databaseCall() </script>';
-// echo $pahgoooo;
-?>
 <?php
-
     echo '<div class="container text-center">';
 
     // Form with the available data options
     echo '
-            <form action="index.php" method="GET">
-                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg" name="dataSource" id="dataSource">
-                    <option value="0" selected>Choose Data Source</option>
-                    <option value="restapi">Rest API</option>
-                    <option value="database">Database</option>
-                    <option value="defaultData">Default (50 Items)</option>
-                </select>
-                <input type="submit" class="btn btn-outline-primary" value="Load Selected Data">
-            </form>
+            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg" name="dataSource" id="dataSource">
+                <option value="0" selected>Choose Data Source</option>
+                <option value="restapi">Rest API</option>
+                <option value="database">Database</option>
+                <option value="defaultData">Default (50 Items)</option>
+            </select>
         ';
 
-        // HERE: clean for empty DOM and set in custom.js loading...
+    // HERE: clean for empty DOM and set in custom.js loading...
     $itemCounter = $paginator->getCurrentPageImageOffset();
     // for ($i = 0; $i < $paginator->getTotalRows(); $i++) {                
         echo '<div class="row">'; // start row                
@@ -28,7 +19,7 @@
             if ($paginator->getCurrentPageImageOffset() <= $paginator->getTotalImages()) {
                 echo '<div class="col">
                     <div class="card">
-                        <img src="'.$base->getAssetsPath().'/no-image.jpg" class="card-img-top" alt="...">
+                        <img src="'.$base->getAssetsPath().'/no_image.jpg" class="card-img-top" alt="...">
                         <div class="card-body">
                             <h5 class="card-title">Title: <strong>'.$itemCounter.'</strong></h5>
                             <p class="card-text">Content ...</p>
@@ -76,8 +67,4 @@
         </nav>
     </div>';
 ?>
-
-    <!-- <script>
-        databaseCall();
-    </script> -->
 

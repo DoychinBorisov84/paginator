@@ -15,6 +15,8 @@ class Database implements DataInterface
     private $connection;
     private $pdo_options = [];
     private $data;
+    private $dataSize;
+
 
     public function __construct()
     {
@@ -78,5 +80,26 @@ class Database implements DataInterface
     public function getData()
     {
         return "database method from class ". get_class($this) ."  returned";
+    }
+
+    public function setData($data)
+    {
+        // var_dump($data);
+        $this->data = $data;
+
+        $this->setDataTotalSize($data);
+    }
+
+    public function setDataTotalSize($data)
+    {
+        // var_dump($data);
+        $this->dataSize = $data;
+    }
+
+    public function getDataTotalSize()
+    {
+        // return sizeof($this->data);
+        return $this->dataSize;
+        
     }
 }
