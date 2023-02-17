@@ -3,34 +3,26 @@ $(document).ready(function(){
     // var li_element = $('li[data-activepage="'+ current_page +'"]'); // current_page passed by when loaded
     // li_element.addClass("active");
 
-    // Set the selectselected based on http-query param
-    var urlParams = (new URL(document.location)).searchParams;
-    var urlDatasource = urlParams.get('dataSource');
-    $('#dataSource').val(urlDatasource);
-
     // Init data loaded, to use size, etc ... on page load ??? 
     initDataCall();
-    // console.log(dataSource, current_page);
 
-    ///////////////////
+    // Trigger dataSource change event
     $("#dataSource").on('change', function () {  
-        // initDataCall();return
-        // Add url params Without reload !!!!
-        // const url = new URL(window.location);
-        // console.log(url);
+        // initDataCall();
         // return;
-        // url.searchParams.set('foo', 'bar');
-        // window.history.pushState({}, '', url);
-        // return;
-
+        
         // get/set/redirect to index based on the dataSource params from the <select>
+        // Refactor and remove if possible to ?
+        // Set the selectselected based on http-query param
+        var urlParams = (new URL(document.location)).searchParams;
+        var urlDatasource = urlParams.get('dataSource');
+        $('#dataSource').val(urlDatasource);
         var currentUrl = new URL(window.location.href);
         var params = new URLSearchParams(currentUrl.search);
         var selectedDatasource = $('#dataSource').find(":selected").val();
-
         params.set('dataSource', selectedDatasource);
         currentUrl.search = params;
-        // Refactor and remove if possible to ?
+
         window.location.href = currentUrl;
     });
     ///////////
@@ -81,44 +73,65 @@ function databaseApiCall(){
     });
 }
 
-function defaultDataCall(){
-    // Todo
+function defaultDataCall(){   
+    initiatePaginator();
 }
 
-function emptySelect(){
-    // Todo
-}
 
 // Call the function into the success() when data is collected via rest-api/database...
 function initiatePaginator(rawApiData){
     var urlParams1 = (new URL(document.location)).searchParams;
-    // var currentUrl = ((new URL(document.location)).search).slice(1);
     var currentUrl = ((new URL(document.location)));
+    // var currentUrl = ((new URL(document.location)).search).slice(1);
     // console.log((new URL(document.location)));
-    // console.log(currentUrl);
-    $.ajax({
-        type: "POST",
-        url: "/paginator/api/Initiator.php",
-        data: { "page" : urlParams1.get('page'), "dataSourceType" : urlParams1.get("dataSource"), "current_url" : currentUrl.href, "ajaxDataSize" : rawApiData.length, "ajaxData" : rawApiData },
-        dataType: "json",
-        // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-        beforeSend: function(){
-            // console.log(rawApiData)
-        },
-        success: function (initPaginatedDataSource) {
-            // console.log(initPaginatedDataSource);
-            setContentHtmlDom(rawApiData, initPaginatedDataSource);
-            setPaginatorHtmlDom(initPaginatedDataSource);
-        },
-        error: function(jqXHR, response){
-            console.log(response, jqXHR);
-        }
-    });
+    // console.log(rawApiData);
+    if(rawApiData != undefined) {
+        $.ajax({
+            type: "POST",
+            url: "/paginator/api/Initiator.php",
+            data: { "page" : urlParams1.get('page'), "dataSourceType" : urlParams1.get("dataSource"), "current_url" : currentUrl.href, "ajaxDataSize" : rawApiData.length, "ajaxData" : rawApiData },
+            dataType: "json",
+            // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            beforeSend: function(){
+                // console.log(rawApiData)
+            },
+            success: function (initPaginatedDataSource) {
+                // console.log(initPaginatedDataSource);
+                setContentHtmlDom(rawApiData, initPaginatedDataSource);
+                setPaginatorHtmlDom(initPaginatedDataSource);
+            },
+            error: function(jqXHR, response){
+                console.log(response, jqXHR);
+            }
+        });
+    }else{
+        // DefaultDataSource call ....
+        // console.log('heree');
+        $.ajax({
+            type: "POST",
+            url: "/paginator/api/Initiator.php",
+            data: { "page" : urlParams1.get('page'), "dataSourceType" : urlParams1.get("dataSource"), "current_url" : currentUrl.href, "ajaxDataSize" : '50', "ajaxData" : 'defaultData'},
+            dataType: "json",
+            // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            beforeSend: function(){
+                // console.log(rawApiData)
+            },
+            success: function (initPaginatedDataSource) {
+                console.log(initPaginatedDataSource);
+                setContentHtmlDom(initPaginatedDataSource.all_data, initPaginatedDataSource);
+                setPaginatorHtmlDom(initPaginatedDataSource);
+            },
+            error: function(jqXHR, response){
+                console.log(response, jqXHR);
+            }
+        });
+    }
 }
 
 function setContentHtmlDom(rawApiData, initPaginatedDataSource){
     // TODO: Unify based on the initPaginatedDataSource -> how to apply the data to the DOM structure
     // console.log(JSON.parse(rawApiData[0].address).country); // Parsing from DB
+    // console.log(rawApiData); 
     
     // Content section create needed rows
     var row = $('.container .row').clone();
@@ -142,7 +155,7 @@ function setContentHtmlDom(rawApiData, initPaginatedDataSource){
             // console.log(rawApiData.length, offset, index, element);
             $(element).find('.card img').attr('src', rawApiData[index+offset+1].avatar);
             $(element).find('.card-body .card-title').text(rawApiData[index+offset+1].first_name);
-            // $(element).find('.card-body .card-text').text(rawApiData[index+offset+1].address.city + ', ' + rawApiData[index+offset+1].email);
+            $(element).find('.card-body .card-text').text(rawApiData[index+offset+1].address.city + ', ' + rawApiData[index+offset+1].email);
     
             if( $(element).find('.card-body .card-text').text().length > 25 ) {
                 var originText = $(element).find('.card-body .card-text').text();

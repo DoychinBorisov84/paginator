@@ -24,9 +24,8 @@ try {
     $dsn = new PDO($dsn, $db_user, $db_password, $pdo_options);
     // Prepare the JSON data for the custom.js
     foreach($dsn->query('SELECT * from users', PDO::FETCH_ASSOC) as $row) {
-        // var_dump($row);
+        $row['address'] = json_decode($row['address']);
         $data[] = $row;
-        // print_r($row);
     }
     // $data['count'] = sizeof($data); // pass the data
 } catch (PDOException $e) {

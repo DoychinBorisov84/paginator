@@ -9,7 +9,7 @@ $dataSource = $_GET['dataSource'];
 // Integrate via DI into Paginator ?
 // Paginator instance for the content
 // Can we achieve ajax returned Obj generated on <select> change to be available initially, so we can instantiate here?
-$paginator = $dataSource != 'defaultData' ? new Paginator(new DataSource($dataSource)) : new Paginator(new DataSource('defaultData'));
+$paginator = new Paginator(new DataSource($dataSource));
 
  ?> 
     <!-- Header -->

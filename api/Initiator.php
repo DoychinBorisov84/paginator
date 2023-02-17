@@ -16,7 +16,7 @@ if(isset($_POST)){
     // $urlParams = $_POST['dummy'];
 }
 
-// var_dump($dataSourceType);
+// var_dump($_POST);
 // die;
 class Initiator
 {
@@ -30,6 +30,7 @@ class Initiator
 
 $dataSource = new DataSource($dataSourceType);
 $paginator = new Paginator($dataSource);
+
 $paginator->setTotalImages($dataSize);
 $paginator->setDataSourceData($data);
 $paginator->setDataSourceDataSize($dataSize);
@@ -51,9 +52,11 @@ $response = [
     'total_rows' => $paginator->getTotalRows(),
     'current_page_images_offset' => $paginator->getCurrentPageImageOffset($currentPage),
     'paginator_get_data_source_data_size' => $paginator->getDataSourceDataSize(),
-    'paginator_dataSource_type' => $paginator->getDataSourceType()
-    // 'last_page' => $paginator->getNextPage($last)
+    'paginator_dataSource_type' => $paginator->getDataSourceType(),
+    'all_data' => $paginator->getDataSourceData()
 ];
+
+// var_dump($response); die;
 echo json_encode($response);
 
 // $array = (array) $paginator;
