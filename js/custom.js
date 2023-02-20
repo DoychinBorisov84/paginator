@@ -2,21 +2,21 @@ $(document).ready(function(){
     // Add the active page class via jquery
     // var li_element = $('li[data-activepage="'+ current_page +'"]'); // current_page passed by when loaded
     // li_element.addClass("active");
+    
+    // get/set/redirect to index based on the dataSource params from the <select>
+    // Refactor and remove if possible to ?
+    // Set the selectselected based on http-query param
+    var urlParams = (new URL(document.location)).searchParams;
+    var urlDatasource = urlParams.get('dataSource');
+    $('#dataSource').val(urlDatasource);
 
     // Init data loaded, to use size, etc ... on page load ??? 
     initDataCall();
 
     // Trigger dataSource change event
     $("#dataSource").on('change', function () {  
-        // initDataCall();
-        // return;
+        // initDataCall();// return;
         
-        // get/set/redirect to index based on the dataSource params from the <select>
-        // Refactor and remove if possible to ?
-        // Set the selectselected based on http-query param
-        var urlParams = (new URL(document.location)).searchParams;
-        var urlDatasource = urlParams.get('dataSource');
-        $('#dataSource').val(urlDatasource);
         var currentUrl = new URL(window.location.href);
         var params = new URLSearchParams(currentUrl.search);
         var selectedDatasource = $('#dataSource').find(":selected").val();
@@ -51,45 +51,17 @@ function restApiCall(){
         });
 }
 
-function databaseApiCall(){
-    $.ajax({
-        type: "GET",
-        url : "/paginator/api/data_sources.php",
-        data: ((new URL(document.location)).search).slice(1),
-        dataType: "json",
-        beforeSend: function(){
-            // console.log('before');
-        },
-        complete: function(jqXHR, status){
-            // console.log(status);
-        },
-        success: function (response) {  
-            // console.log(response);
-            initiatePaginator(response);
-        },
-        error: function(jqXHR, status, error){
-            // console.log(error);
-        }       
-    });
-}
-
-function defaultDataCall(){   
-    initiatePaginator();
-}
-
 
 // Call the function into the success() when data is collected via rest-api/database...
 function initiatePaginator(rawApiData){
-    var urlParams1 = (new URL(document.location)).searchParams;
     var currentUrl = ((new URL(document.location)));
-    // var currentUrl = ((new URL(document.location)).search).slice(1);
-    // console.log((new URL(document.location)));
-    // console.log(rawApiData);
+    // var currentUrl = ((new URL(document.location)).search).slice(1);    
+    // console.log(currentUrl.searchParams.get('dataSource'));
     if(rawApiData != undefined) {
         $.ajax({
             type: "POST",
             url: "/paginator/api/Initiator.php",
-            data: { "page" : urlParams1.get('page'), "dataSourceType" : urlParams1.get("dataSource"), "current_url" : currentUrl.href, "ajaxDataSize" : rawApiData.length, "ajaxData" : rawApiData },
+            data: { "page" : currentUrl.searchParams.get('page'), "dataSourceType" : currentUrl.searchParams.get('dataSource'), "current_url" : currentUrl.href, "ajaxDataSize" : rawApiData.length, "ajaxData" : rawApiData },
             dataType: "json",
             // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             beforeSend: function(){
@@ -110,7 +82,7 @@ function initiatePaginator(rawApiData){
         $.ajax({
             type: "POST",
             url: "/paginator/api/Initiator.php",
-            data: { "page" : urlParams1.get('page'), "dataSourceType" : urlParams1.get("dataSource"), "current_url" : currentUrl.href, "ajaxDataSize" : '50', "ajaxData" : 'defaultData'},
+            data: { "page" : currentUrl.searchParams.get('page'), "dataSourceType" : currentUrl.searchParams.get('dataSource'), "current_url" : currentUrl.href},
             dataType: "json",
             // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             beforeSend: function(){
@@ -118,7 +90,7 @@ function initiatePaginator(rawApiData){
             },
             success: function (initPaginatedDataSource) {
                 console.log(initPaginatedDataSource);
-                setContentHtmlDom(initPaginatedDataSource.all_data, initPaginatedDataSource);
+                setContentHtmlDom(initPaginatedDataSource.dataSource_data, initPaginatedDataSource);
                 setPaginatorHtmlDom(initPaginatedDataSource);
             },
             error: function(jqXHR, response){
@@ -232,23 +204,18 @@ function initDataCall(){
     var selectedDatasource = $('#dataSource').find(":selected").val();    
     
     if(selectedDatasource == 'restapi'){
-        restApiCall(); //'api'; 
+        restApiCall();
         console.log('restApiCall()');
     }else if(selectedDatasource == 'database'){
-        databaseApiCall();
+        //Unify and trigger the local data ->  InitiatePaginator with the url params ?
+        initiatePaginator();
         console.log('databaseApiCall()');
     }else if(selectedDatasource == 'defaultData'){
-        defaultDataCall();
-        console.log('defaultDataCall() 50items');
+        //Unify and trigger the local data ->  InitiatePaginator with the url params ?
+        initiatePaginator();
+        console.log('defaultDataCall()');
     }
     else{
 
-    }
-    
-}
-
-// function test(){
-//     console.log('testing from custom.js');
-//     var xxx = 'Paginator object?';
-//     return xxx;
-// }
+    }    
+}   

@@ -10,7 +10,7 @@ $dataSource = $_GET['dataSource'];
 // Paginator instance for the content
 // Can we achieve ajax returned Obj generated on <select> change to be available initially, so we can instantiate here?
 $paginator = new Paginator(new DataSource($dataSource));
-
+// var_dump($paginator);
  ?> 
     <!-- Header -->
     <?php include ($base->getTemplatesPath('header')); ?>

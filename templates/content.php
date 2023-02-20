@@ -16,7 +16,8 @@
     // for ($i = 0; $i < $paginator->getTotalRows(); $i++) {                
         echo '<div class="row">'; // start row                
         for($k = 0; $k < 4; $k++){ // items/columns per row
-            if ($paginator->getCurrentPageImageOffset() <= $paginator->getTotalImages()) {
+            // if ($paginator->getCurrentPageImageOffset() <= $paginator->getDataSourceDataSize()) {
+                if ($paginator->getCurrentPageImageOffset() <= 103) {
                 echo '<div class="col">
                     <div class="card">
                         <img src="'.$base->getAssetsPath().'/no_image.jpg" class="card-img-top" alt="...">

@@ -6,11 +6,11 @@
  */
 class Paginator
 {
-    private $total_images = 50; // total item incoming API, Database, CONST int ...
+    // private $total_items = 50; // total item incoming API, Database, CONST int ...
 
-    private $images_per_page = 12; // ?User Input -- our needs for the grid
+    private $items_per_page = 12; // ?User Input -- our needs for the grid
 
-    private $images_per_row = 4; // ?? CONST for easy and more gridable rows our needs for the grid
+    private $items_per_row = 4; // ?? CONST for easy and more gridable rows our needs for the grid
 
     private $current_page;
 
@@ -21,8 +21,6 @@ class Paginator
     public function __construct(DataSource $dataSource)
     {        
         $this->setDataSource($dataSource);
-        
-        // $this->setDataSourceData($data); // ?
 
         // Set the page based on http GET param
         $this->getCurrentPage();
@@ -35,21 +33,15 @@ class Paginator
      */
     public function setDataSource($dataSource)
     {
-        // TODO: Sanitize...
-        //TODO:  refactor If we got Database, REST Api or Default ... set the Paginator props below; bring out into method
+        //TODO: Sanitize && refactor If we got Database, REST Api or Default ... set the Paginator props below; bring out into method
         // // Works for DB! How to impelement properly for many sources? The restapi is not being setted up to that point
-        // if( get_class($this->dataSource) == "Database"){
-        //     $this->setTotalImages(sizeof($this->dataSource->getSource()->getAllData()));
-        // }
         $this->dataSource = $dataSource;
     }
 
     public function setDataSourceData($data)
     {
         $this->dataSource->getSource()->setData($data);
-        $this->dataSourceData = $data;
-        
-        return $this->dataSourceData;
+        $this->dataSourceData = $data;  
     }
 
     public function getDataSourceData()
@@ -57,34 +49,17 @@ class Paginator
         return $this->dataSource->getSource()->getData();
     }
 
-    public function setDataSourceDataSize($dataSize)
-    {
-        $this->setTotalImages($dataSize);
-        // var_dump($this->getTotalImages());
-        $this->dataSource->getSource()->setDataTotalSize($dataSize);
-    }
     public function getDataSourceDataSize()
     {
         return $this->dataSource->getSource()->getDataTotalSize();
     }
 
-    /**
-     * Get dataSource
-     */
-    public function getDataSource()
-    {
-        // return $this->dataSource;
-        return $this->dataSource->getSource()->getData();
-
-    }
 
     public function getDataSourceType()
     {
         // var_dump( get_class($this->dataSource->getSource()));
         return get_class($this->dataSource->getSource());
     }
-
-
 
     /**
      * Get previous page class
@@ -116,27 +91,28 @@ class Paginator
      */
     public function getTotalPages()
     {
-        return $total_pages = ceil($this->getTotalImages() / $this->images_per_page);
+        // var_dump($this->getDataSourceDataSize(), $this->items_per_page);
+        return $total_pages = ceil($this->getDataSourceDataSize() / $this->items_per_page);
     }
 
     /**
      * Set total images count, based on data-source
      * 
      */
-    public function setTotalImages($total_images)
-    {
-        $this->total_images = $total_images;
-    }
+    // public function setTotalItems($total_items)
+    // {
+    //     $this->total_items = $total_items;
+    // }
 
     /**
      * Get total images count
      * 
      * @return int
      */
-    public function getTotalImages()
-    {
-        return $this->total_images;
-    }
+    // public function getTotalImages()
+    // {
+    //     return $this->total_items;
+    // }
 
     /**
      * 
@@ -144,7 +120,7 @@ class Paginator
      */
     public function getTotalRows()
     {
-        return $total_rows = ceil($this->images_per_page / $this->images_per_row);        
+        return $total_rows = ceil($this->items_per_page / $this->items_per_row);        
     }
 
     /**
@@ -161,7 +137,7 @@ class Paginator
             $this->current_page = isset($this->sanitizeGetParams()['page']) ? $this->sanitizeGetParams()['page'] : null;
         }
 
-        // var_dump($this->current_page, $this->getTotalPages(), $this->getTotalImages(), $this->images_per_page);
+        // var_dump($this->current_page, $this->getTotalPages(), $this->getTotalImages(), $this->items_per_page);
         // var_dump($this->sanitizeGetParams()['page'], $_SERVER['REQUEST_URI']);
         if (is_null($this->current_page)){
             $this->current_page = 1; // default value if ['page'] param not set up
@@ -300,12 +276,12 @@ class Paginator
      * @return float|int
      */
     public function getCurrentPageImageOffset($current_page = NULL) {
-        $offset = ( ($current_page * $this->images_per_page) - $this->images_per_page + 1);
+        $offset = ( ($current_page * $this->items_per_page) - $this->items_per_page + 1);
         if($current_page <= 0){
             $offset = 1; // first item to begin
         }
         if(!$current_page){
-            $offset = (($this->getCurrentPage() * $this->images_per_page) - $this->images_per_page) + 1; // +1 -> counting from the 1st item       
+            $offset = (($this->getCurrentPage() * $this->items_per_page) - $this->items_per_page) + 1; // +1 -> counting from the 1st item       
     
             if($this->getCurrentPage() <= 0){
                 $offset = 1; // first item to begin

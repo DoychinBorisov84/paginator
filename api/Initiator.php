@@ -8,8 +8,8 @@ $baseAjax = new BaseAjax();
 
 // $data = $_POST['ajaxData'];
 if(isset($_POST)){
-    $data = $_POST['ajaxData'];
-    $dataSize = $_POST['ajaxDataSize'];
+    $data = $_POST['ajaxData'] ?? NULL;
+    $dataSize = $_POST['ajaxDataSize'] ?? NULL;
     $currentPage = $_POST['page'];
     $current_page_url = $_POST['current_url'];
     $dataSourceType = $_POST['dataSourceType'];
@@ -31,9 +31,9 @@ class Initiator
 $dataSource = new DataSource($dataSourceType);
 $paginator = new Paginator($dataSource);
 
-$paginator->setTotalImages($dataSize);
+// $paginator->setTotalItems($dataSize);
 $paginator->setDataSourceData($data);
-$paginator->setDataSourceDataSize($dataSize);
+
 // $paginator->getCurrentPageImageOffset();
 // $paginator->getNextPage($last);
 
@@ -48,12 +48,12 @@ $response = [
     'next_page' => $paginator->getNextPage(FALSE, $currentPage, $paginator->getTotalPages()),
     'last_page' => $paginator->getNextPage(TRUE, $currentPage, $paginator->getTotalPages()),
     'total_pages' => $paginator->getTotalPages(),
-    'total_images' => $paginator->getTotalImages(),
+    'total_images' => $paginator->getDataSourceDataSize(),
     'total_rows' => $paginator->getTotalRows(),
     'current_page_images_offset' => $paginator->getCurrentPageImageOffset($currentPage),
-    'paginator_get_data_source_data_size' => $paginator->getDataSourceDataSize(),
-    'paginator_dataSource_type' => $paginator->getDataSourceType(),
-    'all_data' => $paginator->getDataSourceData()
+    'dataSource_type' => $paginator->getDataSourceType(),
+    'dataSource_data' => $paginator->getDataSourceData(),
+    'dataSource_data_size' => $paginator->getDataSourceDataSize()
 ];
 
 // var_dump($response); die;

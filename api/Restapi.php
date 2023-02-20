@@ -19,21 +19,24 @@ class Restapi implements DataInterface
 
     public function getData()
     {
-        // return "restapi method form class ". get_class($this) ." returned";
-        // var_dump($this->data);
-        // echo json_encode($this->data);
         return $this->data;
     }
     
+    /**
+     * Set the data total size
+     * @param array $data
+     */ 
     public function setDataTotalSize($data)
     {
-        // var_dump($data);
-        $this->dataSize = $data;
+        $this->dataSize = sizeof($data);
     }
+
+   /**
+     * Get the data total size
+     * @return mixed
+     */
     public function getDataTotalSize()
     {
-        // return sizeof($this->data);
         return $this->dataSize;
-        
     }
 }

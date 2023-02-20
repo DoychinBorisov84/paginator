@@ -29,8 +29,12 @@ class Database implements DataInterface
 
         // Set the DB connection
         $this->setConnection();
+
         // Get all data at build up
         $this->getAllData();
+
+        // Set data size
+        // $this->setDataTotalSize($this->getAllData());
     }
 
     /**
@@ -64,22 +68,31 @@ class Database implements DataInterface
     /**
      * Summary of getAllUsers
      * 
-     * @return void
+     * @return mixed
      */
     public function getAllData()
     {
         // TODO: make polymorphic with naming etc...
+        $data = [];
         $query_string = "SELECT * FROM users";
 
-        $this->data = $this->dbQuery($query_string)->fetchAll();
+        // $this->data = $this->dbQuery($query_string)->fetchAll();
 
-        return $this->data;
+        foreach ($this->dbQuery($query_string) as $row) {
+            $row['address'] = json_decode($row['address']);
+            $data[] = $row;
+        }
+
+        // return $this->data;
+        // echo json_encode($data);
+        return $data;
     }
 
 
     public function getData()
     {
-        return "database method from class ". get_class($this) ."  returned";
+        // return "database method from class ". get_class($this) ."  returned";
+        return $this->getAllData();
     }
 
     public function setData($data)
@@ -90,10 +103,16 @@ class Database implements DataInterface
         $this->setDataTotalSize($data);
     }
 
-    public function setDataTotalSize($data)
+    public function setDataTotalSize($data = NULL)
     {
         // var_dump($data);
-        $this->dataSize = $data;
+        // $this->dataSize = $data;
+        if(!$data){
+            $this->dataSize = sizeof($this->getAllData());
+        }else{
+            $this->dataSize = sizeof($data);
+        }
+        return $this->dataSize;
     }
 
     public function getDataTotalSize()
