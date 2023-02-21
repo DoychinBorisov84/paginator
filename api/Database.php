@@ -29,12 +29,6 @@ class Database implements DataInterface
 
         // Set the DB connection
         $this->setConnection();
-
-        // Get all data at build up
-        $this->getAllData();
-
-        // Set data size
-        // $this->setDataTotalSize($this->getAllData());
     }
 
     /**
@@ -48,7 +42,7 @@ class Database implements DataInterface
             $this->connection = new PDO($this->dsn, $this->user, $this->password, $this->pdo_options);
 
         } catch (\PDOException $e) {
-            print "Database Error: ". $e->getMessage();
+            print "Database Connection Error: ". $e->getMessage();
             die();
         }
     }
@@ -56,69 +50,73 @@ class Database implements DataInterface
     /**
      * Make database query
      * 
-     * @return mixed
+     * @return array|mixed
      */
     public function dbQuery($query_string, $pdo_fetch_mode = PDO::FETCH_ASSOC)
     {
-        // Prepare the query string
-        // var_dump($this->connection->query($query_string, $pdo_fetch_mode)->fetchAll());
         return $this->connection->query($query_string, $pdo_fetch_mode);
     }
 
     /**
-     * Summary of getAllUsers
-     * 
-     * @return mixed
+      * Set data || generate default data & trigger to set dataSize
      */
-    public function getAllData()
+    public function setData($data = [])
     {
-        // TODO: make polymorphic with naming etc...
+        $this->data = $data;
+        
+        if(empty($data)) {
+            $this->data = $this->generateDatabaseData();
+        }
+
+        // Set dataSize
+        $this->setDataTotalSize($this->data);
+    }
+
+    /**
+     * Return database data
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Set dataSize
+     */
+    public function setDataTotalSize($data)
+    {        
+        if(empty($data)){
+            $this->dataSize = sizeof($this->getData());
+            return;
+        }
+        $this->dataSize = sizeof($data);
+    }
+
+    /**
+     * Get dataSize
+     * 
+     * @return int
+     */
+    public function getDataSize()
+    {
+        return $this->dataSize;        
+    }
+
+     /**
+     * Generate default data
+     * @return array
+     */
+    private function generateDatabaseData()
+    {
         $data = [];
         $query_string = "SELECT * FROM users";
 
-        // $this->data = $this->dbQuery($query_string)->fetchAll();
-
-        foreach ($this->dbQuery($query_string) as $row) {
+        foreach ($this->dbQuery($query_string)->fetchAll() as $row) {
             $row['address'] = json_decode($row['address']);
             $data[] = $row;
         }
 
-        // return $this->data;
-        // echo json_encode($data);
         return $data;
-    }
-
-
-    public function getData()
-    {
-        // return "database method from class ". get_class($this) ."  returned";
-        return $this->getAllData();
-    }
-
-    public function setData($data)
-    {
-        // var_dump($data);
-        $this->data = $data;
-
-        $this->setDataTotalSize($data);
-    }
-
-    public function setDataTotalSize($data = NULL)
-    {
-        // var_dump($data);
-        // $this->dataSize = $data;
-        if(!$data){
-            $this->dataSize = sizeof($this->getAllData());
-        }else{
-            $this->dataSize = sizeof($data);
-        }
-        return $this->dataSize;
-    }
-
-    public function getDataTotalSize()
-    {
-        // return sizeof($this->data);
-        return $this->dataSize;
-        
     }
 }

@@ -42,7 +42,7 @@ function restApiCall(){
                 // console.log(status);
             },
             success: function (response) {
-                console.log(response);
+                // console.log(response);
                 initiatePaginator(response);
             },
             error: function(jqXHR, status, error){
@@ -51,12 +51,12 @@ function restApiCall(){
         });
 }
 
-
 // Call the function into the success() when data is collected via rest-api/database...
 function initiatePaginator(rawApiData){
     var currentUrl = ((new URL(document.location)));
     // var currentUrl = ((new URL(document.location)).search).slice(1);    
     // console.log(currentUrl.searchParams.get('dataSource'));
+    // console.log(rawApiData);
     if(rawApiData != undefined) {
         $.ajax({
             type: "POST",
@@ -65,10 +65,10 @@ function initiatePaginator(rawApiData){
             dataType: "json",
             // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             beforeSend: function(){
-                // console.log(rawApiData)
+                // console.log(rawApiData);
             },
             success: function (initPaginatedDataSource) {
-                // console.log(initPaginatedDataSource);
+                console.log(initPaginatedDataSource, rawApiData);
                 setContentHtmlDom(rawApiData, initPaginatedDataSource);
                 setPaginatorHtmlDom(initPaginatedDataSource);
             },
@@ -151,7 +151,7 @@ function setContentHtmlDom(rawApiData, initPaginatedDataSource){
 
 function setPaginatorHtmlDom(paginatorArr){
     var paginator = paginatorArr;    
-    console.log(paginator);    // Pagination section
+    // console.log(paginator);    // Pagination section
     $('.pagination .page-item').each(function(index, element){  
         // Show hide the > ...dots/current-page block in pagination
         if($(element).hasClass('iterator-block') ){

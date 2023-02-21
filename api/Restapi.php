@@ -2,18 +2,19 @@
 // include_once('classes/interface/DataInterface.php');
 include_once('/var/www/html/training/paginator/classes/interface/DataInterface.php'); // FIX when complete ajax spl_loading
 
-
 class Restapi implements DataInterface
 {
     private $data;
-
     private $dataSize;    
 
-    public function setData($data)
+     /**
+      * Set data || generate default data & trigger to set dataSize
+     */
+    public function setData($data = [])
     {
-        // var_dump($data);
         $this->data = $data;
 
+        // Set dataSize
         $this->setDataTotalSize($data);
     }
 
@@ -28,6 +29,10 @@ class Restapi implements DataInterface
      */ 
     public function setDataTotalSize($data)
     {
+        if(!$data){
+            $this->dataSize = sizeof($this->getData());
+            return;
+        }
         $this->dataSize = sizeof($data);
     }
 
@@ -35,7 +40,7 @@ class Restapi implements DataInterface
      * Get the data total size
      * @return mixed
      */
-    public function getDataTotalSize()
+    public function getDataSize()
     {
         return $this->dataSize;
     }

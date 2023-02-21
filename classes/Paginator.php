@@ -1,22 +1,17 @@
 <?php
 // require('DataSource.php');
 /**
- * Paginator class 
+ * Paginator class  
  * 
  */
 class Paginator
 {
     // private $total_items = 50; // total item incoming API, Database, CONST int ...
-
     private $items_per_page = 12; // ?User Input -- our needs for the grid
-
     private $items_per_row = 4; // ?? CONST for easy and more gridable rows our needs for the grid
-
     private $current_page;
-
     private $dataSource;
-
-    private $dataSourceData;
+    // private $dataSourceData;
 
     public function __construct(DataSource $dataSource)
     {        
@@ -28,22 +23,24 @@ class Paginator
 
     /**
      * Set Datasource $dataSource
-     * 
-     * @return void
      */
     public function setDataSource($dataSource)
     {
         //TODO: Sanitize && refactor If we got Database, REST Api or Default ... set the Paginator props below; bring out into method
-        // // Works for DB! How to impelement properly for many sources? The restapi is not being setted up to that point
         $this->dataSource = $dataSource;
     }
 
+    /**
+     * Set dataSource data
+     */
     public function setDataSourceData($data)
     {
         $this->dataSource->getSource()->setData($data);
-        $this->dataSourceData = $data;  
     }
 
+    /**
+     * Get dataSource data
+     */
     public function getDataSourceData()
     {
         return $this->dataSource->getSource()->getData();
@@ -51,13 +48,12 @@ class Paginator
 
     public function getDataSourceDataSize()
     {
-        return $this->dataSource->getSource()->getDataTotalSize();
+        return $this->dataSource->getSource()->getDataSize();
     }
-
 
     public function getDataSourceType()
     {
-        // var_dump( get_class($this->dataSource->getSource()));
+        var_dump($this->dataSource);
         return get_class($this->dataSource->getSource());
     }
 
@@ -74,7 +70,7 @@ class Paginator
      */    
     public function getNextPageClass()
     {
-        return $this->getCurrentPage() >= $this->getTotalPages() ? "disabled" : "";
+        return $this->getCurrentPage() >= $this->getTotalItems() ? "disabled" : "";
     }
 
     /**
@@ -82,14 +78,14 @@ class Paginator
      */    
     public function getLastPageClass()
     {
-        return $this->getCurrentPage() >= $this->getTotalPages() ? "link-danger" : "";
+        return $this->getCurrentPage() >= $this->getTotalItems() ? "link-danger" : "";
     }
 
     /**
      * Get total pages based on the items loaded  
      *      
      */
-    public function getTotalPages()
+    public function getTotalItems()
     {
         // var_dump($this->getDataSourceDataSize(), $this->items_per_page);
         return $total_pages = ceil($this->getDataSourceDataSize() / $this->items_per_page);
@@ -137,7 +133,7 @@ class Paginator
             $this->current_page = isset($this->sanitizeGetParams()['page']) ? $this->sanitizeGetParams()['page'] : null;
         }
 
-        // var_dump($this->current_page, $this->getTotalPages(), $this->getTotalImages(), $this->items_per_page);
+        // var_dump($this->current_page, $this->getTotalItems(), $this->getTotalImages(), $this->items_per_page);
         // var_dump($this->sanitizeGetParams()['page'], $_SERVER['REQUEST_URI']);
         if (is_null($this->current_page)){
             $this->current_page = 1; // default value if ['page'] param not set up
@@ -145,9 +141,9 @@ class Paginator
             header('Location: index.php'); // only numeric params
         }
         else{
-            if($this->current_page >= $this->getTotalPages()){
+            if($this->current_page >= $this->getTotalItems()){
             // if($this->current_page >= $this->getDataSourceDataSize()){
-                $this->current_page = $this->getTotalPages(); // max page value
+                $this->current_page = $this->getTotalItems(); // max page value
             }elseif ($this->current_page <= 0) {
                 $this->current_page =  1; // min page value
             }
@@ -191,11 +187,6 @@ class Paginator
             $newPageQuery = http_build_query($newQuery);
 
             return $url = $ajax_path . '?' . $newPageQuery;
-            // var_dump($newQuery);
-            
-            // if($page){
-
-            // }
         }
     }
 
@@ -305,14 +296,14 @@ class Paginator
     
             if($this->getCurrentPage() == 1){
                 return '#';
-            }elseif($this->getCurrentPage() >= $this->getTotalPages()){
+            }elseif($this->getCurrentPage() >= $this->getTotalItems()){
                 // die('sa');
-                $query['page'] =  $this->getTotalPages() - 1 ;
+                $query['page'] =  $this->getTotalItems() - 1 ;
                 $newQuery = http_build_query($query);
                 $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
                 return $previous_page;
     
-                // return $this->getTotalPages() - 1;
+                // return $this->getTotalItems() - 1;
             }
             $query['page'] =  $this->getCurrentPage() - 1 ;
             $newQuery = http_build_query($query);
@@ -324,11 +315,11 @@ class Paginator
                 return '#';
             }elseif($current_page_ajax >= $total_page_ajax){
                 $previous_page = $current_page_ajax - 1;
-                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource=restapi&page=' . $previous_page;
+                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $previous_page;
                 return $implement_uri_not_relying_which_script_is_calling_it;
             }else{
                 $previous_page = $current_page_ajax - 1;
-                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource=restapi&page=' . $previous_page;
+                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $previous_page;
                 return $implement_uri_not_relying_which_script_is_calling_it;
             }
         }
@@ -347,13 +338,13 @@ class Paginator
             $current_page = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
     
     
-            if($this->getCurrentPage() == $this->getTotalPages()){
+            if($this->getCurrentPage() == $this->getTotalItems()){
                 return '#';        
             }elseif ($last_page == true){
-                $query['page'] = $this->getTotalPages();
+                $query['page'] = $this->getTotalItems();
                 $newQuery = http_build_query($query);
                 return $next_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
-                // return $next_page = "{$uri}{$this->getTotalPages()}";
+                // return $next_page = "{$uri}{$this->getTotalItems()}";
             }
             else {
                     // var_dump ($_SERVER['REQUEST_URI'], $_GET, $_SERVER['PHP_SELF']);

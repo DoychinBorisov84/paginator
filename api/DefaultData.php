@@ -8,24 +8,24 @@ class DefaultData implements DataInterface
 
     private $dataSize;
 
-    public function __construct()
-    {
-        // $this->setData($data);
-    }
+    // public function __construct()
+    // {
+    //     // $this->setData($data);
+    // }
 
     
-    /**
-     * @param mixed $data
-     * Sets the data
+   /**
+     * Set data || generate default data & trigger to set dataSize
      */
-    public function setData($data = NULL)
+    public function setData($data = [])
     {
         $this->data = $data;
 
-        if(!$data){
+        if(empty($data)){
             $this->data = $this->generateDefaultData();
         }
 
+        // Set dataSize
         $this->setDataTotalSize($this->data);
     }
 
@@ -43,7 +43,11 @@ class DefaultData implements DataInterface
      * @param array $data
      */ 
     public function setDataTotalSize($data)
-    {
+    {        
+        if(empty($data)){
+            $this->dataSize = sizeof($this->getData());
+            return;
+        }
         $this->dataSize = sizeof($data);
     }
 
@@ -51,7 +55,7 @@ class DefaultData implements DataInterface
      * Get the data total size
      * @return mixed
      */
-    public function getDataTotalSize()
+    public function getDataSize()
     {
         return $this->dataSize;
     }

@@ -6,24 +6,19 @@ $baseAjax = new BaseAjax();
 // include_once('../classes/Base.php');
 // $base = new Base();
 
-// $data = $_POST['ajaxData'];
 if(isset($_POST)){
-    $data = $_POST['ajaxData'] ?? NULL;
+    $data = $_POST['ajaxData'] ?? [];
     $dataSize = $_POST['ajaxDataSize'] ?? NULL;
     $currentPage = $_POST['page'];
     $current_page_url = $_POST['current_url'];
     $dataSourceType = $_POST['dataSourceType'];
-    // $urlParams = $_POST['dummy'];
 }
 
-// var_dump($_POST);
-// die;
 class Initiator
 {
-    // public function initiatePaginator()
+    // public function __construct()
     // {
-    //     //Data preparing
-    //     return json_encode(array('data' => 1, 'bata' => 2));
+            // Return obj
     // }
 
 }
@@ -31,11 +26,7 @@ class Initiator
 $dataSource = new DataSource($dataSourceType);
 $paginator = new Paginator($dataSource);
 
-// $paginator->setTotalItems($dataSize);
 $paginator->setDataSourceData($data);
-
-// $paginator->getCurrentPageImageOffset();
-// $paginator->getNextPage($last);
 
 $response = [
     // 'current_page_url' => $paginator->getPageURL(1),
@@ -44,28 +35,17 @@ $response = [
     'get_page_dot' => $paginator->getPageURL('dot', $current_page_url),
     'get_page_current_page' => $paginator->getPageURL($currentPage, $current_page_url),
     'current_page' => $paginator->getCurrentPage($currentPage),
-    'previous_page' => $paginator->getPreviousPage($currentPage, $paginator->getTotalPages()),
-    'next_page' => $paginator->getNextPage(FALSE, $currentPage, $paginator->getTotalPages()),
-    'last_page' => $paginator->getNextPage(TRUE, $currentPage, $paginator->getTotalPages()),
-    'total_pages' => $paginator->getTotalPages(),
+    'previous_page' => $paginator->getPreviousPage($currentPage, $paginator->getTotalItems()),
+    'next_page' => $paginator->getNextPage(FALSE, $currentPage, $paginator->getTotalItems()),
+    'last_page' => $paginator->getNextPage(TRUE, $currentPage, $paginator->getTotalItems()),
+    'total_items' => $paginator->getTotalItems(),
+    // 'dataSource_data_size' => $paginator->getDataSourceDataSize(),
     'total_images' => $paginator->getDataSourceDataSize(),
     'total_rows' => $paginator->getTotalRows(),
     'current_page_images_offset' => $paginator->getCurrentPageImageOffset($currentPage),
     'dataSource_type' => $paginator->getDataSourceType(),
-    'dataSource_data' => $paginator->getDataSourceData(),
-    'dataSource_data_size' => $paginator->getDataSourceDataSize()
+    'dataSource_data' => $paginator->getDataSourceData()
 ];
 
-// var_dump($response); die;
+// var_dump($_POST); die;
 echo json_encode($response);
-
-// $array = (array) $paginator;
-// echo json_encode($array);
-// var_dump($array->__toArray()); 
-// $dummy = new Dummy();
-
-// var_dump($data, $dataSize);
-
-// $class = new Initiator();
-// $data = $class->initiatePaginator();
-// echo $data;
