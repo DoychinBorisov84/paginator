@@ -18,7 +18,7 @@ class Paginator
         $this->setDataSource($dataSource);
 
         // Set the page based on http GET param
-        $this->getCurrentPage();
+        // $this->getCurrentPage();
     }
 
     /**
@@ -53,7 +53,6 @@ class Paginator
 
     public function getDataSourceType()
     {
-        var_dump($this->dataSource);
         return get_class($this->dataSource->getSource());
     }
 
@@ -70,7 +69,7 @@ class Paginator
      */    
     public function getNextPageClass()
     {
-        return $this->getCurrentPage() >= $this->getTotalItems() ? "disabled" : "";
+        return $this->getCurrentPage() >= $this->getTotalPages() ? "disabled" : "";
     }
 
     /**
@@ -78,17 +77,16 @@ class Paginator
      */    
     public function getLastPageClass()
     {
-        return $this->getCurrentPage() >= $this->getTotalItems() ? "link-danger" : "";
+        return $this->getCurrentPage() >= $this->getTotalPages() ? "link-danger" : "";
     }
 
     /**
      * Get total pages based on the items loaded  
      *      
      */
-    public function getTotalItems()
+    public function getTotalPages()
     {
-        // var_dump($this->getDataSourceDataSize(), $this->items_per_page);
-        return $total_pages = ceil($this->getDataSourceDataSize() / $this->items_per_page);
+        return ceil($this->getDataSourceDataSize() / $this->items_per_page);
     }
 
     /**
@@ -109,6 +107,7 @@ class Paginator
     // {
     //     return $this->total_items;
     // }
+    
 
     /**
      * 
@@ -116,40 +115,164 @@ class Paginator
      */
     public function getTotalRows()
     {
-        return $total_rows = ceil($this->items_per_page / $this->items_per_row);        
+        return ceil($this->items_per_page / $this->items_per_row);        
     }
 
+    public function setCurrentPage($currentPageUrl)
+    {
+    //  Sanitize | Valudate the new param $current_url, passed from ajax requuest
+        $url = parse_url($currentPageUrl);
+
+        parse_str($url['query'], $httpQuery);
+        $pageNow = $httpQuery['page'];
+
+        // $this->current_page = $page;
+        // if(!$page){
+        //     $this->current_page = isset($this->sanitizeGetParams()['page']) ? $this->sanitizeGetParams()['page'] : null;
+        // }
+
+        if (is_null($pageNow)){
+            $this->current_page = 1; // default value if ['page'] param not set up
+        }elseif (!is_numeric($pageNow)) {
+            header('Location: index.php'); // only numeric params
+        }else{
+            if($pageNow >= $this->getTotalPages()){
+            // if($this->current_page >= $this->getDataSourceDataSize()){
+                $this->current_page = $this->getTotalPages(); // max page value
+            }elseif ($pageNow <= 0) {
+                $this->current_page =  1; // min page value
+            }
+            else {
+                $this->current_page = $pageNow;
+            }
+        }        
+        // var_dump($currentPageUrl, $this->current_page, $pageNow);
+        return $this->current_page;
+        // die;
+    }
     /**
      * Get current | min/max page
      * 
      * @return string|int
      */
-    public function getCurrentPage($page = NULL) 
+    public function getCurrentPage($pageNum = null, $currentPageUrl = null, $parseAsUrl = false) 
     {
-        // Assign current page value based on GET
-        // If we make ajax call the init is the class Initiator => $_GET['page] is not setted up => manual setup here
-        $this->current_page = $page;
-        if(!$page){
-            $this->current_page = isset($this->sanitizeGetParams()['page']) ? $this->sanitizeGetParams()['page'] : null;
-        }
 
-        // var_dump($this->current_page, $this->getTotalItems(), $this->getTotalImages(), $this->items_per_page);
-        // var_dump($this->sanitizeGetParams()['page'], $_SERVER['REQUEST_URI']);
-        if (is_null($this->current_page)){
-            $this->current_page = 1; // default value if ['page'] param not set up
-        }elseif (!is_numeric($this->current_page)) {
-            header('Location: index.php'); // only numeric params
-        }
-        else{
-            if($this->current_page >= $this->getTotalItems()){
-            // if($this->current_page >= $this->getDataSourceDataSize()){
-                $this->current_page = $this->getTotalItems(); // max page value
-            }elseif ($this->current_page <= 0) {
-                $this->current_page =  1; // min page value
+        // Sanitize | Valudate the new param $current_url, passed from ajax requuest
+        // $url = parse_url($currentPageUrl);
+
+        // parse_str($url['query'], $httpQuery);
+        // $pageNow = $httpQuery['page'];
+
+        // // $this->current_page = $page;
+        // // if(!$page){
+        // //     $this->current_page = isset($this->sanitizeGetParams()['page']) ? $this->sanitizeGetParams()['page'] : null;
+        // // }
+
+        // if (is_null($pageNow)){
+        //     $this->current_page = 1; // default value if ['page'] param not set up
+        // }elseif (!is_numeric($pageNow)) {
+        //     header('Location: index.php'); // only numeric params
+        // }else{
+        //     if($pageNow >= $this->getTotalPages()){
+        //     // if($this->current_page >= $this->getDataSourceDataSize()){
+        //         $this->current_page = $this->getTotalPages(); // max page value
+        //     }elseif ($pageNow <= 0) {
+        //         $this->current_page =  1; // min page value
+        //     }
+        //     else {
+        //         $this->current_page = $pageNow;
+        //     }
+        // }        
+        // // var_dump($currentPageUrl, $this->current_page, $pageNow);
+        // return $this->current_page;
+        // die;
+        
+
+
+
+
+        if($parseAsUrl && $currentPageUrl){
+            if($pageNum){
+                 // Sanitize | Valudate the new param $current_url, passed from ajax requuest
+                $url = parse_url($currentPageUrl);
+
+                parse_str($url['query'], $httpQuery);
+                // $pageNow = $httpQuery['page'];
+
+                // if($this->getCurrentPage($pageNow) == $this->getTotalPages()){
+                //     return '#';        
+                // }elseif ($lastPage == true){
+                //     $httpQuery['page'] = $this->getTotalPages();
+                // }
+                // else {
+                //     $httpQuery['page'] = $pageNow + 1;
+                // } 
+
+                $httpQuery['page'] = $pageNum;
+
+                $url['query'] = http_build_query($httpQuery);
+                $pageAsUrl = $url['path'].'?'.$url['query'];
+
+                return $pageAsUrl;
+                // var_dump($httpQuery, $url, $next_page);
+                // die;
+            }else{
+                $url = parse_url($currentPageUrl);
+
+                // parse_str($url['query'], $httpQuery);
+
+                // $pageNow = $httpQuery['page'];
+
+                // if($this->getCurrentPage($pageNow) == $this->getTotalPages()){
+                //     return '#';        
+                // }elseif ($lastPage == true){
+                //     $httpQuery['page'] = $this->getTotalPages();
+                // }
+                // else {
+                //     $httpQuery['page'] = $pageNow + 1;
+                // } 
+
+                // $httpQuery['page'] = $pageNum;
+
+                // $url['query'] = http_build_query($httpQuery);
+                $pageAsUrl = $url['path'].'?'.$url['query'];
+
+                return $pageAsUrl;
             }
         }
-        
+
         return $this->current_page;
+
+
+
+
+
+
+
+        // Assign current page value based on GET
+        // If we make ajax call the init is the class Initiator => $_GET['page] is not setted up => manual setup here
+        // $this->current_page = $page;
+        // if(!$page){
+        //     $this->current_page = isset($this->sanitizeGetParams()['page']) ? $this->sanitizeGetParams()['page'] : null;
+        // }
+
+        // // var_dump($this->sanitizeGetParams()['page'], $_SERVER['REQUEST_URI']);
+        // // var_dump($this->current_page);
+        // if (is_null($this->current_page)){
+        //     $this->current_page = 1; // default value if ['page'] param not set up
+        // }elseif (!is_numeric($this->current_page)) {
+        //     header('Location: index.php'); // only numeric params
+        // }
+        // else{
+        //     if($this->current_page >= $this->getTotalPages()){
+        //     // if($this->current_page >= $this->getDataSourceDataSize()){
+        //         $this->current_page = $this->getTotalPages(); // max page value
+        //     }elseif ($this->current_page <= 0) {
+        //         $this->current_page =  1; // min page value
+        //     }
+        // }        
+        //  return $this->current_page;
     }
 
     /**
@@ -287,94 +410,155 @@ class Paginator
      * 
      * @return string
      */
-    public function getPreviousPage($current_page_ajax = NULL, $total_page_ajax = NULL)
+    public function getPreviousPage($currentPageUrl)
     {
-        if(!$current_page_ajax && !$total_page_ajax){
-            $query = $_GET; // current http-query
-            $query['page'] = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
+        // Sanitize | Valudate the new param $current_url, passed from ajax requuest
+        $url = parse_url($currentPageUrl);
+
+        parse_str($url['query'], $httpQuery);
+        $pageNow = $httpQuery['page'];
+
+        if($this->getCurrentPage() == 1){
+            return '#';
+        }elseif($this->getCurrentPage() >= $this->getTotalPages()){
+            $httpQuery['page'] = $this->getTotalPages() - 1;
+
+            // die('sa');
+            // $query['page'] =  $this->getTotalPages() - 1 ;
+            // $newQuery = http_build_query($query);
+            // $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
+            // return $previous_page;
+
+            // return $this->getTotalPages() - 1;
+        }else{
+            $httpQuery['page'] = $this->getCurrentPage() - 1;
+        }
+        $url['query'] = http_build_query($httpQuery);
+        $previous_page = $url['path'].'?'.$url['query'];
+
+        return $previous_page;
+
+
+        // $query['page'] =  $this->getCurrentPage() - 1 ;
+        // $newQuery = http_build_query($query);
+        // return $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
+
+
+
+
+
+
+        // if(!$current_page_ajax && !$total_page_ajax){
+        //     $query = $_GET; // current http-query
+        //     $query['page'] = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
     
     
-            if($this->getCurrentPage() == 1){
-                return '#';
-            }elseif($this->getCurrentPage() >= $this->getTotalItems()){
-                // die('sa');
-                $query['page'] =  $this->getTotalItems() - 1 ;
-                $newQuery = http_build_query($query);
-                $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
-                return $previous_page;
+        //     if($this->getCurrentPage() == 1){
+        //         return '#';
+        //     }elseif($this->getCurrentPage() >= $this->getTotalPages()){
+        //         // die('sa');
+        //         $query['page'] =  $this->getTotalPages() - 1 ;
+        //         $newQuery = http_build_query($query);
+        //         $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
+        //         return $previous_page;
     
-                // return $this->getTotalItems() - 1;
-            }
-            $query['page'] =  $this->getCurrentPage() - 1 ;
-            $newQuery = http_build_query($query);
-            return $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
+        //         // return $this->getTotalPages() - 1;
+        //     }
+        //     $query['page'] =  $this->getCurrentPage() - 1 ;
+        //     $newQuery = http_build_query($query);
+        //     return $previous_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
     
             // return $previous_page = $this->getCurrentPage() - 1;
-        }else{
-            if($current_page_ajax == 1){
-                return '#';
-            }elseif($current_page_ajax >= $total_page_ajax){
-                $previous_page = $current_page_ajax - 1;
-                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $previous_page;
-                return $implement_uri_not_relying_which_script_is_calling_it;
-            }else{
-                $previous_page = $current_page_ajax - 1;
-                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $previous_page;
-                return $implement_uri_not_relying_which_script_is_calling_it;
-            }
-        }
+        // }else{
+        //     if($current_page_ajax == 1){
+        //         return '#';
+        //     }elseif($current_page_ajax >= $total_page_ajax){
+        //         $previous_page = $current_page_ajax - 1;
+        //         $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $previous_page;
+        //         return $implement_uri_not_relying_which_script_is_calling_it;
+        //     }else{
+        //         $previous_page = $current_page_ajax - 1;
+        //         $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $previous_page;
+        //         return $implement_uri_not_relying_which_script_is_calling_it;
+        //     }
+        // }
     }
 
     /**
      * Get next page
      * @return string
      */
-    public function getNextPage($last_page = FALSE, $current_page_ajax = NULL, $total_pages_ajax = NULL)
+    public function getNextPage($lastPage = false, $currentPageUrl = null)
     {    
-        if(!$current_page_ajax && !$total_pages_ajax){
-            // $uri = "index.php?page=";
-            $query = $_GET; // current http-query
-            // $query['page'] = $_GET['page']; // current http-query {page} param
-            $current_page = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
-    
-    
-            if($this->getCurrentPage() == $this->getTotalItems()){
-                return '#';        
-            }elseif ($last_page == true){
-                $query['page'] = $this->getTotalItems();
-                $newQuery = http_build_query($query);
-                return $next_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
-                // return $next_page = "{$uri}{$this->getTotalItems()}";
-            }
-            else {
-                    // var_dump ($_SERVER['REQUEST_URI'], $_GET, $_SERVER['PHP_SELF']);
-                // $query = $_GET;
-                // $query['page'] = $_GET['page'] + 1;
-                $query['page'] = $current_page + 1;
-                $newQuery = http_build_query($query);
-                $next_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
-                return $next_page;
-                // var_dump($query, $newQuery, $next_page);
-                    // die;
-    
-                // $next_page = $this->getCurrentPage() + 1;
-                // return "{$uri}{$next_page}";
-            }
-        }else{
-            // TODO: reimplement the above
-            if($current_page_ajax == $total_pages_ajax){
-                return '#';  
-            }elseif($last_page == TRUE){
-                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $total_pages_ajax;
-                return $implement_uri_not_relying_which_script_is_calling_it;
-            }
-            else{
-                $next_page = $current_page_ajax + 1;
-                $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $next_page;
-                // strtolower($this->getDataSourceType());
-                return $implement_uri_not_relying_which_script_is_calling_it;
-            }
+        // Sanitize | Valudate the new param $current_url, passed from ajax requuest
+        $url = parse_url($currentPageUrl);
+
+        parse_str($url['query'], $httpQuery);
+        $pageNow = $httpQuery['page'];
+
+        if($this->getCurrentPage($pageNow) == $this->getTotalPages()){
+            return '#';        
+        }elseif ($lastPage == true){
+            $httpQuery['page'] = $this->getTotalPages();
         }
+        else {
+            $httpQuery['page'] = $pageNow + 1;
+        } 
+        $url['query'] = http_build_query($httpQuery);
+        $next_page = $url['path'].'?'.$url['query'];
+
+        return $next_page;
+        // var_dump($httpQuery, $url, $next_page);
+        // die;
+
+        
+
+        
+
+        // if(!$current_page_ajax && !$total_pages_ajax){
+        //     // $uri = "index.php?page=";
+        //     $query = $_GET; // current http-query
+        //     // $query['page'] = $_GET['page']; // current http-query {page} param
+        //     $current_page = isset($_GET['page']) ? $_GET['page'] : $this->current_page; // current http-query {page} param
+    
+    
+        //     if($this->getCurrentPage() == $this->getTotalPages()){
+        //         return '#';        
+        //     }elseif ($lastPage == true){
+        //         $query['page'] = $this->getTotalPages();
+        //         $newQuery = http_build_query($query);
+        //         return $next_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
+        //         // return $next_page = "{$uri}{$this->getTotalPages()}";
+        //     }
+        //     else {
+        //             // var_dump ($_SERVER['REQUEST_URI'], $_GET, $_SERVER['PHP_SELF']);
+        //         // $query = $_GET;
+        //         // $query['page'] = $_GET['page'] + 1;
+        //         $query['page'] = $current_page + 1;
+        //         $newQuery = http_build_query($query);
+        //         $next_page = $_SERVER['PHP_SELF'] .'?'. $newQuery;
+        //         return $next_page;
+        //         // var_dump($query, $newQuery, $next_page);
+        //             // die;
+    
+        //         // $next_page = $this->getCurrentPage() + 1;
+        //         // return "{$uri}{$next_page}";
+        //     }
+        // }else{
+        //     // TODO: reimplement the above
+        //     if($current_page_ajax == $total_pages_ajax){
+        //         return '#';  
+        //     }elseif($lastPage == TRUE){
+        //         $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $total_pages_ajax;
+        //         return $implement_uri_not_relying_which_script_is_calling_it;
+        //     }
+        //     else{
+        //         $next_page = $current_page_ajax + 1;
+        //         $implement_uri_not_relying_which_script_is_calling_it = '/paginator/index.php?dataSource='. strtolower($this->getDataSourceType()) .'&page=' . $next_page;
+        //         // strtolower($this->getDataSourceType());
+        //         return $implement_uri_not_relying_which_script_is_calling_it;
+        //     }
+        // }
 
     }
 

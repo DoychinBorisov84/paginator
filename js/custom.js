@@ -3,9 +3,7 @@ $(document).ready(function(){
     // var li_element = $('li[data-activepage="'+ current_page +'"]'); // current_page passed by when loaded
     // li_element.addClass("active");
     
-    // get/set/redirect to index based on the dataSource params from the <select>
-    // Refactor and remove if possible to ?
-    // Set the selectselected based on http-query param
+    // Set the select->selected based on http-query param
     var urlParams = (new URL(document.location)).searchParams;
     var urlDatasource = urlParams.get('dataSource');
     $('#dataSource').val(urlDatasource);
@@ -179,7 +177,7 @@ function setPaginatorHtmlDom(paginatorArr){
 
         $(element).find('#last-page').attr('href', paginator.last_page); // ,paginatorArr[index+offset+1].avatar        
 
-        $(element).find('#current-page').attr('href', paginator.get_page_current_page);
+        $(element).find('#current-page').attr('href', paginator.get_page_current);
         $(element).find('#current-page').text(paginator.current_page);
         $(element).find('#current-page').parent().attr('data-activepage', paginator.current_page);
         $(element).find('#current-page').parent().addClass('active');

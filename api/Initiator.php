@@ -6,11 +6,12 @@ $baseAjax = new BaseAjax();
 // include_once('../classes/Base.php');
 // $base = new Base();
 
+// Validate / Sanitize class? 
 if(isset($_POST)){
     $data = $_POST['ajaxData'] ?? [];
     $dataSize = $_POST['ajaxDataSize'] ?? NULL;
     $currentPage = $_POST['page'];
-    $current_page_url = $_POST['current_url'];
+    $currentPageUrl = $_POST['current_url'];
     $dataSourceType = $_POST['dataSourceType'];
 }
 
@@ -24,24 +25,28 @@ class Initiator
 }
 
 $dataSource = new DataSource($dataSourceType);
-$paginator = new Paginator($dataSource);
 
+$paginator = new Paginator($dataSource);
 $paginator->setDataSourceData($data);
+$paginator->setCurrentPage($currentPageUrl);
+
 
 $response = [
-    // 'current_page_url' => $paginator->getPageURL(1),
-    'get_page_1' => $paginator->getPageURL(1, $current_page_url),
-    'get_page_2' => $paginator->getPageURL(2, $current_page_url),
-    'get_page_dot' => $paginator->getPageURL('dot', $current_page_url),
-    'get_page_current_page' => $paginator->getPageURL($currentPage, $current_page_url),
-    'current_page' => $paginator->getCurrentPage($currentPage),
-    'previous_page' => $paginator->getPreviousPage($currentPage, $paginator->getTotalItems()),
-    'next_page' => $paginator->getNextPage(FALSE, $currentPage, $paginator->getTotalItems()),
-    'last_page' => $paginator->getNextPage(TRUE, $currentPage, $paginator->getTotalItems()),
-    'total_items' => $paginator->getTotalItems(),
-    // 'dataSource_data_size' => $paginator->getDataSourceDataSize(),
-    'total_images' => $paginator->getDataSourceDataSize(),
+    'next_page' => $paginator->getNextPage(FALSE, $currentPageUrl),
+    'last_page' => $paginator->getNextPage(TRUE, $currentPageUrl),
+    'current_page' => $paginator->getCurrentPage(),
+    'previous_page' => $paginator->getPreviousPage($currentPageUrl),
+    // 'current_page' => $paginator->getCurrentPage($currentPage, $currentPageUrl),
+    // 'previous_page' => $paginator->getPreviousPage($currentPage, $paginator->getTotalPages()),    
+    'get_page_1' => $paginator->getCurrentPage(1, $currentPageUrl, true),
+    'get_page_2' => $paginator->getCurrentPage(2, $currentPageUrl, true),
+    'get_page_current' => $paginator->getCurrentPage(false, $currentPageUrl, true),
+    // 'get_page_1' => $paginator->getPageURL(1, $currentPageUrl),
+    // 'get_page_2' => $paginator->getPageURL(2, $currentPageUrl),
+    // 'get_page_dot' => $paginator->getPageURL('dot', $currentPageUrl),
+    'total_pages' => $paginator->getTotalPages(),
     'total_rows' => $paginator->getTotalRows(),
+    'total_items' => $paginator->getDataSourceDataSize(),
     'current_page_images_offset' => $paginator->getCurrentPageImageOffset($currentPage),
     'dataSource_type' => $paginator->getDataSourceType(),
     'dataSource_data' => $paginator->getDataSourceData()

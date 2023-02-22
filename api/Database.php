@@ -33,8 +33,6 @@ class Database implements DataInterface
 
     /**
      * Set PDO connection
-     * 
-     * @return void
      */
     public function setConnection()
     {
@@ -49,7 +47,6 @@ class Database implements DataInterface
 
     /**
      * Make database query
-     * 
      * @return array|mixed
      */
     public function dbQuery($query_string, $pdo_fetch_mode = PDO::FETCH_ASSOC)
@@ -69,7 +66,7 @@ class Database implements DataInterface
         }
 
         // Set dataSize
-        $this->setDataTotalSize($this->data);
+        $this->setDataSize($this->data);
     }
 
     /**
@@ -84,7 +81,7 @@ class Database implements DataInterface
     /**
      * Set dataSize
      */
-    public function setDataTotalSize($data)
+    public function setDataSize($data)
     {        
         if(empty($data)){
             $this->dataSize = sizeof($this->getData());
@@ -95,7 +92,6 @@ class Database implements DataInterface
 
     /**
      * Get dataSize
-     * 
      * @return int
      */
     public function getDataSize()

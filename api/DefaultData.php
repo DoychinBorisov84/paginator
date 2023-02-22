@@ -8,13 +8,7 @@ class DefaultData implements DataInterface
 
     private $dataSize;
 
-    // public function __construct()
-    // {
-    //     // $this->setData($data);
-    // }
-
-    
-   /**
+    /**
      * Set data || generate default data & trigger to set dataSize
      */
     public function setData($data = [])
@@ -26,7 +20,7 @@ class DefaultData implements DataInterface
         }
 
         // Set dataSize
-        $this->setDataTotalSize($this->data);
+        $this->setDataSize($this->data);
     }
 
     /**
@@ -42,7 +36,7 @@ class DefaultData implements DataInterface
      * Set the data total size
      * @param array $data
      */ 
-    public function setDataTotalSize($data)
+    public function setDataSize($data)
     {        
         if(empty($data)){
             $this->dataSize = sizeof($this->getData());

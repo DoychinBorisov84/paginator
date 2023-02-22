@@ -15,7 +15,7 @@ class Restapi implements DataInterface
         $this->data = $data;
 
         // Set dataSize
-        $this->setDataTotalSize($data);
+        $this->setDataSize($data);
     }
 
     public function getData()
@@ -27,7 +27,7 @@ class Restapi implements DataInterface
      * Set the data total size
      * @param array $data
      */ 
-    public function setDataTotalSize($data)
+    public function setDataSize($data)
     {
         if(!$data){
             $this->dataSize = sizeof($this->getData());
