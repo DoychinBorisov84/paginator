@@ -1,41 +1,35 @@
 <?php
-    echo '<div class="container text-center">';
+// var_dump(strpos(dirname(__DIR__), '/', -10), basename($_SERVER['DOCUMENT_ROOT']), $_SERVER);
+
+
+echo '<div class="container text-center">';
+
+    echo '<a type="button" class="btn btn-secondary btn-lg" href="'.$base->getHome().'">Home</a>';
 
     // Form with the available data options
     echo '
             <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg" name="dataSource" id="dataSource">
-                <option value="0" selected>Choose Data Source</option>
+                <option value="" selected>Choose Data Source</option>
                 <option value="restapi">Rest API</option>
                 <option value="database">Database</option>
                 <option value="defaultData">Default (50 Items)</option>
             </select>
         ';
 
-    // HERE: clean for empty DOM and set in custom.js loading...
-    $itemCounter = $paginator->getCurrentPageImageOffset();
-    // for ($i = 0; $i < $paginator->getTotalRows(); $i++) {                
         echo '<div class="row">'; // start row                
-        for($k = 0; $k < 4; $k++){ // items/columns per row
-            // if ($paginator->getCurrentPageImageOffset() <= $paginator->getDataSourceDataSize()) {
-                if ($paginator->getCurrentPageImageOffset() <= 105) {
-                echo '<div class="col">
-                    <div class="card">
-                        <img src="'.$base->getAssetsPath().'/no_image.jpg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Title: <strong>'.$itemCounter.'</strong></h5>
-                            <p class="card-text">Content ...</p>
-                            <a href="#" class="btn btn-primary">Read more</a>
-                        </div>
+            echo '<div class="col">
+                <div class="card">
+                    <img src="'.$base->getAssetsPath().'/no_image.jpg" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">Title: <strong>Default title</strong></h5>
+                        <p class="card-text">Content ...</p>
+                        <a href="#" class="btn btn-primary">Read more</a>
                     </div>
-                </div>';
-                $itemCounter ++;
-            }else{
-                echo '<div class="col"></div>'; // empty img col
-            }
-        }
+                </div>
+            </div>';
         echo '</div>'; // end row
-    // }
-    echo '</div>';
+    
+    echo '</div>'; // end container
 
     //<!-- Pagination -->
     echo '<div class="container-lg p-4">';

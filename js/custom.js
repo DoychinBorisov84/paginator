@@ -1,131 +1,75 @@
 $(document).ready(function(){
-    // Add the active page class via jquery
-    // var li_element = $('li[data-activepage="'+ current_page +'"]'); // current_page passed by when loaded
-    // li_element.addClass("active");
-    
-    // Set the select->selected based on http-query param
-    var urlParams = (new URL(document.location)).searchParams;
-    var urlDatasource = urlParams.get('dataSource');
-    $('#dataSource').val(urlDatasource);
-
-    // Init data loaded, to use size, etc ... on page load ??? 
     initDataCall();
 
     // Trigger dataSource change event
     $("#dataSource").on('change', function () {  
-        // initDataCall();// return;
-        
-        var currentUrl = new URL(window.location.href);
-        var params = new URLSearchParams(currentUrl.search);
-        var selectedDatasource = $('#dataSource').find(":selected").val();
-        params.set('dataSource', selectedDatasource);
-        currentUrl.search = params;
-
-        window.location.href = currentUrl;
+        setDataSourceAndRedirect();
     });
-    ///////////
-
 });
 
-// Make the API ajax call
+// External Resource API ajax collect data
 function restApiCall(){
         $.ajax({
             type: "GET",
             url : "https://random-data-api.com/api/v2/users?size=88&response_type=json",
             dataType: "json",
-            beforeSend: function(){
-                // console.log('before');
-            },
-            complete: function(jqXHR, status){
-                // console.log(status);
-            },
             success: function (response) {
-                // console.log(response);
                 initiatePaginator(response);
             },
             error: function(jqXHR, status, error){
-                // console.log(error);
+                console.log(error);
             }       
         });
 }
 
-// Call the function into the success() when data is collected via rest-api/database...
+// Collect our data from the API | local resources and fill the html DOM with the data
 function initiatePaginator(rawApiData){
     var currentUrl = ((new URL(document.location)));
-    // var currentUrl = ((new URL(document.location)).search).slice(1);    
-    // console.log(currentUrl.searchParams.get('dataSource'));
-    // console.log(rawApiData);
-    if(rawApiData != undefined) {
+    var data = rawApiData !== undefined ? rawApiData : {}; // have|not initial data to send for preparation
+
         $.ajax({
             type: "POST",
             url: "/paginator/api/Initiator.php",
-            data: { "page" : currentUrl.searchParams.get('page'), "dataSourceType" : currentUrl.searchParams.get('dataSource'), "current_url" : currentUrl.href, "ajaxDataSize" : rawApiData.length, "ajaxData" : rawApiData },
+            data: {"ajaxData" : data, "ajaxDataSourceType" : currentUrl.searchParams.get('dataSource'), "ajaxCurrentUrl" : currentUrl.href },
             dataType: "json",
-            // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-            beforeSend: function(){
-                // console.log(rawApiData);
-            },
             success: function (initPaginatedDataSource) {
                 console.log(initPaginatedDataSource, rawApiData);
-                setContentHtmlDom(rawApiData, initPaginatedDataSource);
+                setContentHtmlDom(initPaginatedDataSource);
                 setPaginatorHtmlDom(initPaginatedDataSource);
             },
             error: function(jqXHR, response){
                 console.log(response, jqXHR);
             }
         });
-    }else{
-        // DefaultDataSource call ....
-        // console.log('heree');
-        $.ajax({
-            type: "POST",
-            url: "/paginator/api/Initiator.php",
-            data: { "page" : currentUrl.searchParams.get('page'), "dataSourceType" : currentUrl.searchParams.get('dataSource'), "current_url" : currentUrl.href},
-            dataType: "json",
-            // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-            beforeSend: function(){
-                // console.log(rawApiData)
-            },
-            success: function (initPaginatedDataSource) {
-                console.log(initPaginatedDataSource);
-                setContentHtmlDom(initPaginatedDataSource.dataSource_data, initPaginatedDataSource);
-                setPaginatorHtmlDom(initPaginatedDataSource);
-            },
-            error: function(jqXHR, response){
-                console.log(response, jqXHR);
-            }
-        });
-    }
 }
 
-function setContentHtmlDom(rawApiData, initPaginatedDataSource){
-    // TODO: Unify based on the initPaginatedDataSource -> how to apply the data to the DOM structure
-    // console.log(JSON.parse(rawApiData[0].address).country); // Parsing from DB
-    // console.log(rawApiData); 
-    
-    // Content section create needed rows
+function setContentHtmlDom(initPaginatedDataSource){
+    // console.log(initPaginatedDataSource);
+
+    // Add the rows
     var row = $('.container .row').clone();
-    for(var i = 0; i < initPaginatedDataSource.total_rows - 1 ; i++){
-        // console.log(i);
-        $(row).insertAfter($('.container .row'));    
+    for(let i = 0; i < initPaginatedDataSource.total_rows - 1 ; i++){
+        $(row).insertAfter($('.container .row'));
     }
 
-    // setPaginatorHtmlDom(rawApiData);
+    // Add the columns
+    $.each($('.container .row'), function(index, element){
+        for (let index = 0; index < initPaginatedDataSource.total_items_per_row - 1; index++) {
+            var col = $('.container .row .col').clone();
 
-    var urlParams = (new URL(document.location)).searchParams;
-    var urlPage = urlParams.get('page');
-    var offset = ((urlPage * 12) - 12); // +1
-    
+            $(element).append($(col.first()));
+        }  
+    });
+
     // Fill the DOM with the data received
+    var offset = initPaginatedDataSource.current_page_images_offset;    
     $('.container .row .col').each(function(index, element){
         // console.log(rawApiData.length, offset, index, element );
-
-        // Unify the approach for the data received
-        if (rawApiData.length > (offset + 1 + index) ) {
+        if (initPaginatedDataSource.dataSource_data.length > (offset + index) ) {
             // console.log(rawApiData.length, offset, index, element);
-            $(element).find('.card img').attr('src', rawApiData[index+offset+1].avatar);
-            $(element).find('.card-body .card-title').text(rawApiData[index+offset+1].first_name);
-            $(element).find('.card-body .card-text').text(rawApiData[index+offset+1].address.city + ', ' + rawApiData[index+offset+1].email);
+            $(element).find('.card img').attr('src', initPaginatedDataSource.dataSource_data[offset+index].avatar);
+            $(element).find('.card-body .card-title').text(initPaginatedDataSource.dataSource_data[offset+index].first_name);
+            $(element).find('.card-body .card-text').text(initPaginatedDataSource.dataSource_data[offset+index].address.city + ', ' + initPaginatedDataSource.dataSource_data[offset+index].email);
     
             if( $(element).find('.card-body .card-text').text().length > 25 ) {
                 var originText = $(element).find('.card-body .card-text').text();
@@ -141,15 +85,15 @@ function setContentHtmlDom(rawApiData, initPaginatedDataSource){
                         $(element).find('.card-body .card-text').text(slicedText);
                     }
                 );
-            }
-            
+            }            
         }
     });
 }
 
+// Set the paginator data, classes, active elements etc based on the data collected 
 function setPaginatorHtmlDom(paginatorArr){
     var paginator = paginatorArr;    
-    // console.log(paginator);    // Pagination section
+    
     $('.pagination .page-item').each(function(index, element){  
         // Show hide the > ...dots/current-page block in pagination
         if($(element).hasClass('iterator-block') ){
@@ -175,7 +119,7 @@ function setPaginatorHtmlDom(paginatorArr){
         
         $(element).find('#next-page').attr('href', paginator.next_page);
 
-        $(element).find('#last-page').attr('href', paginator.last_page); // ,paginatorArr[index+offset+1].avatar        
+        $(element).find('#last-page').attr('href', paginator.last_page); 
 
         $(element).find('#current-page').attr('href', paginator.get_page_current);
         $(element).find('#current-page').text(paginator.current_page);
@@ -199,21 +143,31 @@ function setPaginatorHtmlDom(paginatorArr){
 
 // Init the call, so we can have base dataSource
 function initDataCall(){
-    var selectedDatasource = $('#dataSource').find(":selected").val();    
-    
-    if(selectedDatasource == 'restapi'){
-        restApiCall();
-        console.log('restApiCall()');
-    }else if(selectedDatasource == 'database'){
-        //Unify and trigger the local data ->  InitiatePaginator with the url params ?
-        initiatePaginator();
-        console.log('databaseApiCall()');
-    }else if(selectedDatasource == 'defaultData'){
-        //Unify and trigger the local data ->  InitiatePaginator with the url params ?
-        initiatePaginator();
-        console.log('defaultDataCall()');
-    }
-    else{
+    // Set the select->selected based on http-query param
+    var urlParams = (new URL(document.location)).searchParams;
+    var urlDatasource = urlParams.get('dataSource');    
+    $('#dataSource').val(urlDatasource);
 
-    }    
+    if(urlDatasource != ''){
+        if(urlDatasource == 'restapi'){
+            restApiCall();
+        }else if(urlDatasource == 'database'){
+            initiatePaginator();
+        }else if(urlDatasource == 'defaultData'){
+            initiatePaginator();
+        }
+    }
 }   
+
+function setDataSourceAndRedirect(){
+    var currentUrl = new URL(window.location.href);
+    var params = new URLSearchParams(currentUrl.search);
+    var selectedDatasource = $('#dataSource').find(":selected").val();
+
+    if(selectedDatasource != ''){
+        params.set('dataSource', selectedDatasource);
+        currentUrl.search = params;
+    
+        window.location.href = currentUrl;
+    }
+}

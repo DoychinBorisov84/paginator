@@ -38,6 +38,11 @@ class Base
     {
         return 'assets';
     }
+
+    public function getHome()
+    {
+        return $this->rootPath = '/paginator/index.php';
+    }
     
 
     // TODO: register the api/ folder

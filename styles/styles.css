@@ -13,3 +13,7 @@ body {
 .iterator-block{
     display: none;
 }
+
+.btn{
+    margin: 1%;
+}
