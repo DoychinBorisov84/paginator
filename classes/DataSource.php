@@ -1,19 +1,20 @@
 <?php
-// include_once('api/Database.php');
-// include_once('api/Restapi.php');
-// include_once('api/DefaultData.php');
-include_once('/var/www/html/training/paginator/api/Database.php');
-include_once('/var/www/html/training/paginator/api/Restapi.php');
-include_once('/var/www/html/training/paginator/api/DefaultData.php'); // FIX when complete ajax spl_loading
-
+/**
+ * class DataSource - creating instances of our data source classes
+ */
 class DataSource 
 {
     private $source; 
 
     public function __construct($source)
     {
-        // Create, sanitize from source class and return ... only if class/dir/available ???
-        $this->source = new $source();
+        try {
+            $source = ucfirst($source);
+            
+            $this->source = new $source();
+        } catch (\Throwable $th) {
+            echo 'Fail to create DataSource object: ' . $th->getMessage();
+        }
     }
 
     public function getSource()

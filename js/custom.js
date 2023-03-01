@@ -22,7 +22,7 @@ function restApiCall(){
         });
 }
 
-// Collect our data from the API | local resources and fill the html DOM with the data
+// Collect our data from the API | local | database sources and fill the html DOM with the data
 function initiatePaginator(rawApiData){
     var currentUrl = ((new URL(document.location)));
     var data = rawApiData !== undefined ? rawApiData : {}; // have|not initial data to send for preparation
@@ -33,7 +33,6 @@ function initiatePaginator(rawApiData){
             data: {"ajaxData" : data, "ajaxDataSourceType" : currentUrl.searchParams.get('dataSource'), "ajaxCurrentUrl" : currentUrl.href },
             dataType: "json",
             success: function (initPaginatedDataSource) {
-                console.log(initPaginatedDataSource, rawApiData);
                 setContentHtmlDom(initPaginatedDataSource);
                 setPaginatorHtmlDom(initPaginatedDataSource);
             },
@@ -43,9 +42,8 @@ function initiatePaginator(rawApiData){
         });
 }
 
+// Dynamically create DOM structure based on the data source 
 function setContentHtmlDom(initPaginatedDataSource){
-    // console.log(initPaginatedDataSource);
-
     // Add the rows
     var row = $('.container .row').clone();
     for(let i = 0; i < initPaginatedDataSource.total_rows - 1 ; i++){
@@ -64,9 +62,7 @@ function setContentHtmlDom(initPaginatedDataSource){
     // Fill the DOM with the data received
     var offset = initPaginatedDataSource.current_page_images_offset;    
     $('.container .row .col').each(function(index, element){
-        // console.log(rawApiData.length, offset, index, element );
         if (initPaginatedDataSource.dataSource_data.length > (offset + index) ) {
-            // console.log(rawApiData.length, offset, index, element);
             $(element).find('.card img').attr('src', initPaginatedDataSource.dataSource_data[offset+index].avatar);
             $(element).find('.card-body .card-title').text(initPaginatedDataSource.dataSource_data[offset+index].first_name);
             $(element).find('.card-body .card-text').text(initPaginatedDataSource.dataSource_data[offset+index].address.city + ', ' + initPaginatedDataSource.dataSource_data[offset+index].email);
@@ -90,7 +86,7 @@ function setContentHtmlDom(initPaginatedDataSource){
     });
 }
 
-// Set the paginator data, classes, active elements etc based on the data collected 
+// Set the paginator section data, classes, active elements etc based on the data source obj and the current page
 function setPaginatorHtmlDom(paginatorArr){
     var paginator = paginatorArr;    
     

@@ -1,7 +1,4 @@
 <?php
-// include_once('classes/interface/DataInterface.php');
-include_once('/var/www/html/training/paginator/classes/interface/DataInterface.php'); // fix when done ajax spl_load
-
 class DefaultData implements DataInterface
 {
     private $data;

@@ -1,10 +1,5 @@
 <?php
-// include_once('../classes/Paginator.php');
-// include_once('../classes/DataSource.php');
-include_once('../classes/BaseAjax.php');
-$baseAjax = new BaseAjax();
-// include_once('../classes/Base.php');
-// $base = new Base();
+include_once(__DIR__.'/../config/ajax_common.php');
 
 // Validate / Sanitize class? 
 if(isset($_POST)){
@@ -16,19 +11,20 @@ if(isset($_POST)){
 // Implement as REST API ? 
 class Initiator
 {
-    // public function __construct()
-    // {
-            // Return obj
-    // }
+    public function __construct()
+    {
+            echo 'Initiator init';
+    }
 
 }
 
 $dataSource = new DataSource($dataSourceType);
 
 $paginator = new Paginator($dataSource);
-
 $paginator->setDataSourceData($data);
 $paginator->setCurrentPage($currentPageUrl);
+
+// var_dump(__CLASS__);
 
 $response = [
     'next_page' => $paginator->getNextPage(FALSE, $currentPageUrl),

@@ -1,7 +1,4 @@
 <?php
-// var_dump(strpos(dirname(__DIR__), '/', -10), basename($_SERVER['DOCUMENT_ROOT']), $_SERVER);
-
-
 echo '<div class="container text-center">';
 
     echo '<a type="button" class="btn btn-secondary btn-lg" href="'.$base->getHome().'">Home</a>';
@@ -19,7 +16,7 @@ echo '<div class="container text-center">';
         echo '<div class="row">'; // start row                
             echo '<div class="col">
                 <div class="card">
-                    <img src="'.$base->getAssetsPath().'/no_image.jpg" class="card-img-top" alt="...">
+                    <img src="'.$base->getAssetsPath().'/chart.jpg" class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">Title: <strong>Default title</strong></h5>
                         <p class="card-text">Content ...</p>

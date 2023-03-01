@@ -1,13 +1,12 @@
 <?php
-// require('DataSource.php');
 /**
  * Paginator class  
  * 
  */
 class Paginator
 {
-    private $items_per_page = 12; // ?User Input -- our needs for the grid
-    private $items_per_row = 4; //TODO: Create setter and make them dynamic
+    private $items_per_page = 12; // ?dynamic | user input
+    private $items_per_row = 4; // ?dynamic | user input
     private $current_page;
     private $dataSource;
 
@@ -127,7 +126,7 @@ class Paginator
     {
         $parsedUrlArr = parse_url($currentPageUrl); 
 
-        $legalQueryParameters = $this->sanitizeGetParams($parsedUrlArr);        
+        $legalQueryParameters = $this->sanitizeGetParams($parsedUrlArr);
         // Unvalid one|many http query parameters
         if(!$legalQueryParameters){
             $this->current_page = null;
@@ -160,7 +159,6 @@ class Paginator
             die;
         }        
 
-        // var_dump($this->current_page);
         if($parseAsUrl && strlen($currentPageUrl) > 0){
             $parsedUrlArr = parse_url($currentPageUrl);       
             parse_str($parsedUrlArr['query'], $httpQuery);
@@ -191,12 +189,12 @@ class Paginator
      * Sanitize http query string
      * 
      * @param array $parsedHttpUrl
+     * 
      * @return array|null
      */
     public function sanitizeGetParams(array $parsedHttpUrl) : ?array
     {
         // Get the http-query url params as array
-        // $url = parse_url($parsedHttpUrl);
         parse_str($parsedHttpUrl['query'], $httpQuery);
         
         // List of allowed GET parameters to check against     
@@ -244,7 +242,7 @@ class Paginator
             if ($key == 'page'){
                 $validatedParameters = filter_var($value, FILTER_VALIDATE_FLOAT);
             }elseif ($key == 'dataSource'){
-                $options = ['restapi', 'database', 'default', 0];
+                $options = ['restapi', 'database', 'defaultData'];
 
                 $validatedParameters = $value;                
                 if(!in_array($value, $options)){
@@ -354,9 +352,5 @@ class Paginator
 
         return $next_page;
     }
-
-    public function __toArray(){
-        return call_user_func('get_object_vars', $this);
-    }
-
+    
 }

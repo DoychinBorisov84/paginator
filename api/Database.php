@@ -1,9 +1,4 @@
 <?php
-// include_once('classes/interface/DataInterface.php');
-include_once('/var/www/html/training/paginator/classes/interface/DataInterface.php'); // FIX when complete ajax spl_loading
-
-
-// TODO: make the class polymorphic and remove hardcoded data/props etc
 class Database implements DataInterface
 {
     private $database;
