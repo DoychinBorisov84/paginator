@@ -1,20 +1,7 @@
 <?php
-require_once('classes/Base.php');
-// Base::autoload();
-$base = new Base();
-// include_once('classes/Paginator.php');
-// $base = new Base();
-// $paginator = new Paginator();
-// var_dump(get_included_files());
-// echo $paginator->paginate();
-// echo $base->getTemplatesPath('content');
-
-    
-
-    // var_dump(nextPage($current_page, $total_pages), $current_page, $total_pages);
-    // var_dump($total_pages, $total_rows, $current_page, $counter_images_current_page);
-
- ?> 
+require_once(__DIR__.'/config/ajax_common.php');
+ ?>
+  
     <!-- Header -->
     <?php include ($base->getTemplatesPath('header')); ?>
     

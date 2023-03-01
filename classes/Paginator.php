@@ -1,21 +1,65 @@
 <?php
 /**
- * Paginator class 
+ * Paginator class  
  * 
  */
 class Paginator
 {
-    private $total_images = 50; // total item incoming API, Database, CONST int ...
-
-    private $images_per_page = 12; // ?User Input -- our needs for the grid
-
-    private $images_per_row = 4; // ?? CONST for easy and more gridable rows our needs for the grid
-
+    private $items_per_page = 12; // ?dynamic | user input
+    private $items_per_row = 4; // ?dynamic | user input
     private $current_page;
+    private $dataSource;
 
-    public function __construct()
+    public function __construct(DataSource $dataSource)
+    {        
+        $this->setDataSource($dataSource);
+    }
+
+    /**
+     * Set Datasource $dataSource
+     */
+    public function setDataSource($dataSource)
     {
-        $this->current_page = $this->getCurrentPage();
+        $this->dataSource = $dataSource;
+    }
+
+    /**
+     * Set dataSource data
+     * 
+     * @param array $data based on the passed [] of data when creating
+     */
+    public function setDataSourceData(array $data)
+    {
+        $this->dataSource->getSource()->setData($data);
+    }
+
+    /**
+     * Get data from the initialized DataSource
+     * @return array
+     */
+    public function getDataSourceData() : array
+    {
+        return $this->dataSource->getSource()->getData();
+    }
+
+    /**
+     * Get Initialized DataSource [] size
+     * 
+     * @return int
+     */
+    public function getDataSourceDataSize() : int
+    {
+        return $this->dataSource->getSource()->getDataSize();
+    }
+
+    /**
+     * Get Initialized DataSource class name as string
+     * 
+     * @return string
+     */
+    public function getDataSourceType(): string
+    {
+        return get_class($this->dataSource->getSource());
     }
 
     /**
@@ -44,91 +88,141 @@ class Paginator
 
     /**
      * Get total pages based on the items loaded  
-     *      
+     * 
+     * @return float|int     
      */
     public function getTotalPages()
     {
-        return $total_pages = ceil($this->getTotalImages() / $this->images_per_page);
-    }
-
-    /**
-     * Get total images count
-     * 
-     */
-    public function getTotalImages()
-    {
-        return $this->total_images;
+        return ceil($this->getDataSourceDataSize() / $this->items_per_page);
     }
 
     /**
      * 
      * Get total rows per page
+     * 
+     * @return float|int     
      */
     public function getTotalRows()
     {
-        return $total_rows = ceil($this->images_per_page / $this->images_per_row);        
+        return ceil($this->items_per_page / $this->items_per_row);        
+    }
+
+    /**
+     * Get items per row
+     * 
+     * @return int
+     */
+    public function getTotalItemsPerRow() : int
+    {
+        return $this->items_per_row;
+    }
+
+    /**
+     * Set current page based on the http request parameters
+     * 
+     * @param string $currentPageUrl
+     */
+    public function setCurrentPage($currentPageUrl)
+    {
+        $parsedUrlArr = parse_url($currentPageUrl); 
+
+        $legalQueryParameters = $this->sanitizeGetParams($parsedUrlArr);
+        // Unvalid one|many http query parameters
+        if(!$legalQueryParameters){
+            $this->current_page = null;
+            return null;  // illegal value -> set default
+            die();
+        }
+
+        $this->current_page =  $legalQueryParameters['page'] ?? 1; // default page if missing http query param
+
+        if($this->current_page >= $this->getTotalPages()){
+            $this->current_page = $this->getTotalPages(); // max page value
+        }elseif ($this->current_page <= 0) {
+            $this->current_page =  1; // min page value
+        }            
+        
+        return $this->current_page;        
     }
 
     /**
      * Get current | min/max page
      * 
-     * @return string|int
+     * @param bool $pageNum - specific page, @param string $currentPageUrl, @param bool $parseAsUrl - whether to parse
+     * 
+     * @return int|string|null
      */
-    public function getCurrentPage() 
+    public function getCurrentPage($exactPageNum = false, $currentPageUrl = '', $parseAsUrl = false) 
     {
-        // Assign current page value based on GET
-        $this->current_page = isset($this->sanitizeGetParams()['page']) ? $this->sanitizeGetParams()['page'] : null;
+        if(is_null($this->current_page)){
+            return null;            
+            die;
+        }        
 
-        if (is_null($this->current_page)){
-            $this->current_page = 1; // default value if ['page'] param not set up
-        }elseif (!is_numeric($this->current_page)) {
-            header('Location: index.php'); // only numeric params
-        }
-        else{
-            if($this->current_page >= $this->getTotalPages()){
-                $this->current_page = $this->getTotalPages(); // max page value
-            }elseif ($this->current_page <= 0) {
-                $this->current_page =  1; // min page value
+        if($parseAsUrl && strlen($currentPageUrl) > 0){
+            $parsedUrlArr = parse_url($currentPageUrl);       
+            parse_str($parsedUrlArr['query'], $httpQuery);
+
+            if($exactPageNum){
+                $httpQuery['page'] = $exactPageNum;
+            }else{
+                $pageNow = $httpQuery['page'] ?? $this->getCurrentPage();
+
+                if($pageNow >= $this->getTotalPages()){
+                    $httpQuery['page'] = $this->getTotalPages();
+                }elseif($pageNow <= 1){
+                    $httpQuery['page'] = 1;
+                }else{
+                    $httpQuery['page'] = $pageNow;
+                }
             }
+            $parsedUrlArr['query'] = http_build_query($httpQuery);
+            $pageAsUrl = $parsedUrlArr['path'].'?'.$parsedUrlArr['query'];
+            
+            return $pageAsUrl;
         }
 
         return $this->current_page;
     }
 
      /**
-     * Sanitize GET input
-     * TODO: accept [] of parameters to sanitize
-     * @return array
+     * Sanitize http query string
+     * 
+     * @param array $parsedHttpUrl
+     * 
+     * @return array|null
      */
-    public function sanitizeGetParams()
+    public function sanitizeGetParams(array $parsedHttpUrl) : ?array
     {
+        // Get the http-query url params as array
+        parse_str($parsedHttpUrl['query'], $httpQuery);
+        
         // List of allowed GET parameters to check against     
-        $availableGetParams = array('page');
+        $allowedGetParams = array('page', 'dataSource');
+        $allowedGetParamsKeys = array_flip($allowedGetParams);
+
         $parameterSecured = [];
 
-        if(!empty($_GET)){     
-            foreach ($availableGetParams as $parameter) {
-                if(!array_key_exists($parameter, $_GET)){
-                    header('Location: index.php'); 
-                    die;
-                }
-                
-                # TODO: create Validation class to handle the process, with error msg to display ...
-                // Sanitize            
-                $parameterSanitized[$parameter] = trim(htmlspecialchars($_GET[$parameter]));
-                
-                // Validate
-                $parameterValidated[$parameter] = $this->validateGetParams($parameterSanitized);
-
-                if($parameterValidated[$parameter] === FALSE){
-                    header('Location: index.php');
-                    die;
-                }
-                
-                $parameterSecured[$parameter] = $parameterValidated[$parameter];
+        foreach ($httpQuery as $parameter => $value) {
+            // Unvalid http query param
+            if(!array_key_exists($parameter, $allowedGetParamsKeys)){
+                return null;
             }
+
+            # TODO: create Validation|Sanitization class to handle the process, with error msg to display ...
+            // Sanitize            
+            $parameterSanitized[$parameter] = trim(htmlspecialchars($httpQuery[$parameter]));
+            
+            // Validate
+            $parameterValidated[$parameter] = $this->validateGetParams($parameterSanitized);
+
+            // Unvalid http query value
+            if($parameterValidated[$parameter] === false){
+                return null;
+            }
+            $parameterSecured[$parameter] = $parameterValidated[$parameter];
         }
-        
+                
         return $parameterSecured;
     }
 
@@ -143,63 +237,120 @@ class Paginator
     {
         $validatedParameters = [];
 
-        // Validate GET params 
+        // Validate http query params  
         foreach ($parameter as $key => $value) {
-            if($key == 'page'){
+            if ($key == 'page'){
                 $validatedParameters = filter_var($value, FILTER_VALIDATE_FLOAT);
-            }
-            # TODO: add updated list of GET param checks
-        }        
+            }elseif ($key == 'dataSource'){
+                $options = ['restapi', 'database', 'defaultData'];
 
+                $validatedParameters = $value;                
+                if(!in_array($value, $options)){
+                    $validatedParameters = false;
+                }
+            }
+        }
+        
         return $validatedParameters;
     }
 
     /**
      * Get current images offset, based on the get page parameter
      * 
-     * @return float|int
+     * @return float|int|null
      */
-    public function getCurrentPageImageOffset() {
-        $offset = (($this->getCurrentPage() * $this->images_per_page) - $this->images_per_page) + 1; // +1 -> counting from the 1st item       
+    public function getCurrentPageImageOffset($currentPageUrl = '') {   
 
-        if($this->getCurrentPage() <= 0){
-            $offset = 1; // first item to begin
+        if(is_null($this->getCurrentPage())){
+            return null;            
+            die;
+        }       
+        
+        //Remove Not needed, keeping for the index.php currently
+        if(strlen($currentPageUrl) < 0){
+            return $offset = (($this->getCurrentPage() * $this->items_per_page) - $this->items_per_page);
+        }else{
+            $pageNow = $this->getCurrentPage();
+            
+            // Currently allowing -+ values over our real pages to be used => set min|max page based on the below
+            $offset = ( ($pageNow * $this->items_per_page) - $this->items_per_page);            
+            if($pageNow <= 0){
+                $offset = 0; // first item to start
+            }elseif($pageNow > $this->getTotalPages()){
+                $offset = ($this->getTotalPages() * $this->items_per_page) - $this->items_per_page;
+            }
+            return $offset;
         }
-
-        return $offset;
     }
 
     /**
      * Get previous page
      * 
-     * @return string
+     * @return string|null
      */
-    public function getPreviousPage()
+    public function getPreviousPage($currentPageUrl)
     {
-        if($this->getCurrentPage() == 1){
+        if(is_null($this->getCurrentPage())){
+            return null;            
+            die;
+        }  
+        
+        // Get the [query] from the current page url Send
+        $parsedUrlArr = parse_url($currentPageUrl);
+        parse_str($parsedUrlArr['query'], $httpQuery);            
+        
+        $pageNow = $this->getCurrentPage();        
+        if($pageNow == 1){
             return '#';
-        }else if($this->getCurrentPage() >= $this->getTotalPages()){
-            return $this->getTotalPages() - 1;
+        }elseif($pageNow >= $this->getTotalPages()){
+            $httpQuery['page'] = $this->getTotalPages() - 1;
+        }else{
+            $httpQuery['page'] = $pageNow - 1;
         }
-        return $previous_page = $this->getCurrentPage() - 1;
+        $parsedUrlArr['query'] = http_build_query($httpQuery);
+        $previous_page = $parsedUrlArr['path'].'?'.$parsedUrlArr['query'];
+
+        return $previous_page;
     }
 
     /**
      * Get next page
-     * @return string
+     * 
+     * @param bool $lastPage - true to return the last page, @param string $currentPageUrl - http query string
+     * 
+     * @return string|null
      */
-    public function getNextPage($last_page = false)
-    {
-        $uri = "index.php?page=";
-        if($this->getCurrentPage() == $this->getTotalPages()){
+    public function getNextPage($lastPage = false, $currentPageUrl)
+    {    
+        if(is_null($this->getCurrentPage())){
+            return null;            
+            die;
+        }  
+
+        // Get the [query] from the current page url Send
+        $parsedUrlArr = parse_url($currentPageUrl);
+        parse_str($parsedUrlArr['query'], $httpQuery);  
+
+        $pageNow = $this->getCurrentPage();
+        if ($pageNow == $this->getTotalPages()){
             return '#';        
-        }elseif ($last_page == true){
-            return $next_page = "{$uri}{$this->getTotalPages()}";
+        }elseif ($lastPage == true){
+            $httpQuery['page'] = $this->getTotalPages();
         }
         else {
-            $next_page = $this->getCurrentPage() + 1;
-            return "{$uri}{$next_page}";
-        }  
-    }
+            $httpQuery['page'] = $pageNow + 1;
 
+            if($pageNow >= $this->getTotalPages()){
+                $httpQuery['page'] = $this->getTotalPages();
+            }elseif ($pageNow < 1){
+                $httpQuery['page'] = 1;
+            }
+        } 
+        
+        $parsedUrlArr['query'] = http_build_query($httpQuery);
+        $next_page = $parsedUrlArr['path'].'?'.$parsedUrlArr['query'];
+
+        return $next_page;
+    }
+    
 }

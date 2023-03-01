@@ -5,3 +5,15 @@ body {
 .card-body{
     background-color: wheat;
 }
+
+.onFocus{
+    font: italic normal bold 20px/40px Helvetica, sans-serif ;
+}
+
+.iterator-block{
+    display: none;
+}
+
+.btn{
+    margin: 1%;
+}
