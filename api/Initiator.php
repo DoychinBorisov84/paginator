@@ -1,5 +1,10 @@
 <?php
+// namespace Paginator\Api;
 include_once(__DIR__.'/../config/ajax_common.php');
+
+use Paginator\Classes\DataSource as DataSource;
+use Paginator\Api\DefaultData as DefaultData;
+// use Paginator\Classes\Paginator as Paginator;
 
 // Validate / Sanitize class? 
 if(isset($_POST)){
@@ -7,6 +12,8 @@ if(isset($_POST)){
     $currentPageUrl = $_POST['ajaxCurrentUrl'];
     $dataSourceType = $_POST['ajaxDataSourceType'];
 }
+
+// var_dump(new Paginator( new DataSource('database')));
 
 // Implement as REST API ? 
 class Initiator
@@ -17,10 +24,11 @@ class Initiator
     }
 
 }
-
 $dataSource = new DataSource($dataSourceType);
-
+// var_dump($dataSource);
 $paginator = new Paginator($dataSource);
+// var_dump($paginator);
+
 $paginator->setDataSourceData($data);
 $paginator->setCurrentPage($currentPageUrl);
 

@@ -1,4 +1,9 @@
 <?php
+// namespace Paginator\Classes;
+
+use Paginator\Classes\DataSource as DataSource;
+// use Paginator\Api\Database as Database;
+use Paginator\Api\DefaultData as DefaultData;
 /**
  * Paginator class  
  * 
@@ -30,6 +35,7 @@ class Paginator
      */
     public function setDataSourceData(array $data)
     {
+        // var_dump( $this->dataSource->getSource());
         $this->dataSource->getSource()->setData($data);
     }
 

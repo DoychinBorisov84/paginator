@@ -1,4 +1,6 @@
 <?php
+namespace Paginator\Classes;
+
 /**
  * Base class - to avoid multiple spl_autoload() calls and obj creations, class is based on Singleton Pattern
  */
@@ -75,8 +77,28 @@ class Base
             );
 
             foreach ($dirs as $dir) {
+                // echo $class.' '. __NAMESPACE__. ' ; ';
+                // echo $dir . $class . '.php';
+                // var_dump($dir . ' - ' .$class);
                 if (file_exists($dir.$class.'.php')){
-                    require_once($dir.$class . '.php');
+                    require_once($dir . $class . '.php');
+                    // var_dump($dir . ' - ' . $class . ' - '. '.php');
+                }else{
+                    $namespaceAsArray = explode('\\', $class);
+                    $theClass = end($namespaceAsArray) . '.php';
+                    // var_dump($dir . ' - ' . $class . ' - '. '.php');
+                    if( file_exists( $dir . $theClass ) ){
+                        // var_dump( $dir . $theClass);
+                        require_once($dir . $theClass);
+                    }
+                    // var_dump($dir . (str_replace('\\', '/', $class))  . '.php');
+
+
+                    // require_once( (str_replace('\\', '/', $class))  . '.php');
+                    // require_once( $dir. (str_replace('\\', '/', $class))  . '.php');
+                    // require_once($dir . (str_replace('\\', '/', $class))  . '.php');
+                    
+                    // require_once($dir . $class . '.php');
                 }
             }
         });
