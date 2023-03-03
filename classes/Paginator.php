@@ -1,4 +1,7 @@
 <?php
+namespace Paginator\Classes;
+
+use Paginator\Classes\DataSource as DataSource;
 /**
  * Paginator class  
  * 

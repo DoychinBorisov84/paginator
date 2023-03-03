@@ -1,4 +1,8 @@
 <?php
+namespace Paginator\Api;
+
+use Paginator\Classes\Interfaces\DataInterface as DataInterface;
+
 class Database implements DataInterface
 {
     private $database;
@@ -32,7 +36,7 @@ class Database implements DataInterface
     public function setConnection()
     {
         try {
-            $this->connection = new PDO($this->dsn, $this->user, $this->password, $this->pdo_options);
+            $this->connection = new \PDO($this->dsn, $this->user, $this->password, $this->pdo_options);
 
         } catch (\PDOException $e) {
             print "Database Connection Error: ". $e->getMessage();
@@ -44,7 +48,7 @@ class Database implements DataInterface
      * Make database query
      * @return array|mixed
      */
-    public function dbQuery($query_string, $pdo_fetch_mode = PDO::FETCH_ASSOC)
+    public function dbQuery($query_string, $pdo_fetch_mode = \PDO::FETCH_ASSOC)
     {
         return $this->connection->query($query_string, $pdo_fetch_mode);
     }

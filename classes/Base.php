@@ -1,6 +1,8 @@
 <?php
+namespace Paginator\Classes;
+
 /**
- * Base class - to avoid multiple spl_autoload() calls and obj creations, class is based on Singleton Pattern
+ * Base class - Singleton Pattern
  */
 class Base
 {
@@ -38,7 +40,6 @@ class Base
     public function getTemplatesPath(string $template = '')
     {
         $templateDir = basename('../templates');
-        
         if(isset($template) && $template != ''){
             // Check if template exists
             $templateFile = $template . '.php';
@@ -76,7 +77,13 @@ class Base
 
             foreach ($dirs as $dir) {
                 if (file_exists($dir.$class.'.php')){
-                    require_once($dir.$class . '.php');
+                    require_once($dir . $class . '.php');
+                }else{
+                    $namespaceAsArray = explode('\\', $class);
+                    $theClass = end($namespaceAsArray) . '.php';
+                    if( file_exists( $dir . $theClass ) ){
+                        require_once($dir . $theClass);
+                    }
                 }
             }
         });

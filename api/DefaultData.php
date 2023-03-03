@@ -1,4 +1,8 @@
 <?php
+namespace Paginator\Api;
+
+use Paginator\Classes\Interfaces\DataInterface as DataInterface;
+
 class DefaultData implements DataInterface
 {
     private $data;

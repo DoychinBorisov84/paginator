@@ -1,4 +1,8 @@
 <?php
+namespace Paginator\Api;
+
+use Paginator\Classes\Interfaces\DataInterface;
+
 class Restapi implements DataInterface
 {
     private $data;
