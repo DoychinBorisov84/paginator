@@ -29,7 +29,7 @@ function initiatePaginator(rawApiData){
 
         $.ajax({
             type: "POST",
-            url: "/paginator/api/Initiator.php",
+            url: "/paginator/api/initPaginator.php",
             data: {"ajaxData" : data, "ajaxDataSourceType" : currentUrl.searchParams.get('dataSource'), "ajaxCurrentUrl" : currentUrl.href },
             dataType: "json",
             success: function (initPaginatedDataSource) {

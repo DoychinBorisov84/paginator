@@ -1,9 +1,5 @@
 <?php
 namespace Paginator\Classes;
-
-// use Paginator\Classes\Interfaces\DataInterface as DataInterface;
-use Paginator\Api\Database as Database;
-use Paginator\Api\DefaultData as DefaultData;
 /**
  * class DataSource - creating instances of our data source classes
  */
@@ -14,9 +10,10 @@ class DataSource
     public function __construct($source)
     {
         try {
-            $source = ucfirst($source);
+            $source = ucfirst($source);            
+            $class = "Paginator\\Api\\{$source}";
             
-            $this->source = new $source();
+            $this->source = new $class();
         } catch (\Throwable $th) {
             echo 'Fail to create DataSource object of type: '. $source . ', ' . $th->getMessage();
         }
